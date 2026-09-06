@@ -19,7 +19,7 @@ final class TapGraph {
             guard plan.count <= 64 else { throw AudioFailure(operation: "Too many audio sources") }
             var descriptions: [CATapDescription] = []
             for source in plan {
-                let description = source.exclusive ? CATapDescription(stereoGlobalTapButExcludeProcesses: source.processes) : CATapDescription(stereoMixdownOfProcesses: source.processes)
+                let description = source.exclusive ? CATapDescription(excludingProcesses: source.processes, deviceUID: device.uid, stream: 0) : CATapDescription(processes: source.processes, deviceUID: device.uid, stream: 0)
                 description.name = "FoFoBooster · \(source.key)"
                 description.isPrivate = true
                 description.muteBehavior = analysisOnly || source.key == "__analysis__" ? .unmuted : .mutedWhenTapped
