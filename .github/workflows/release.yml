@@ -1,0 +1,92 @@
+name: Signed macOS build
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v[0-9]*']
+permissions:
+  contents: read
+concurrency:
+  group: signed-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'Sweet-Papa-Technologies/FoFo-Audio-Booster' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: macos-15
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require reviewed main history and matching version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          git merge-base --is-ancestor HEAD origin/main
+          if [[ "$REF_TYPE" == tag ]]; then
+            version=$(/usr/libexec/PlistBuddy -c 'Print CFBundleShortVersionString' Config/Info.plist)
+            [[ "$REF_NAME" == "v$version" ]]
+          fi
+      - name: Run regression suite without signing secrets
+        run: scripts/test.sh
+      - name: Build universal app
+        run: xcodebuild -project FoFoBooster.xcodeproj -scheme FoFoBooster -configuration Release -derivedDataPath .build/xcode -clonedSourcePackagesDirPath .build/packages CODE_SIGNING_ALLOWED=NO ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO build
+      - name: Preserve app bundle and Sparkle release tools
+        run: |
+          mkdir -p build/artifacts
+          ditto -c -k --keepParent .build/xcode/Build/Products/Release/FoFoBooster.app build/artifacts/FoFoBooster-unsigned.zip
+          ditto -c -k --keepParent .build/packages/artifacts/sparkle/Sparkle/bin build/artifacts/Sparkle-tools.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-release-input
+          path: build/artifacts/*.zip
+          retention-days: 2
+  sign:
+    needs: build
+    runs-on: macos-15
+    timeout-minutes: 90
+    environment: signing
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: unsigned-release-input
+          path: build/input
+      - name: Unpack verified build artifacts
+        run: |
+          mkdir -p build/release .build/packages/artifacts/sparkle/Sparkle
+          ditto -x -k build/input/FoFoBooster-unsigned.zip build/release
+          ditto -x -k build/input/Sparkle-tools.zip .build/packages/artifacts/sparkle/Sparkle
+      - name: Import only the release environment credentials
+        env:
+          APPLE_CERT_P12: ${{ secrets.APPLE_CERT_P12 }}
+          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: python3 scripts/signing/import-ci.py
+      - name: Sign, notarize, staple, package, and sign appcast
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: scripts/release.sh --skip-build --app build/release/FoFoBooster.app
+      - name: Remove ephemeral signing material
+        if: always()
+        run: |
+          if [[ -n "${SIGNING_KEYCHAIN:-}" && -f "$SIGNING_KEYCHAIN" ]]; then
+            security delete-keychain "$SIGNING_KEYCHAIN"
+          fi
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: FoFoBooster-signed-notarized
+          if-no-files-found: error
+          retention-days: 30
+          path: |
+            build/release/FoFoBooster-*.dmg
+            build/release/FoFoBooster-*.pkg
+            build/release/FoFoBooster-*.zip
+            build/release/appcast.xml
+            build/release/fofobooster.rb
+            build/release/SHA256SUMS
+            build/release/*.notary.json

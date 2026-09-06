@@ -1,0 +1,20 @@
+# scripts/make-cask.py produces the final cask from the notarized release artifact.
+cask "fofobooster" do
+  version "@VERSION@"
+  sha256 "@SHA256@"
+  url "https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/releases/download/v#{version}/FoFoBooster-#{version}.dmg"
+  name "FoFoBooster"
+  desc "Per-app audio boost with peak protection and Audio Unit effects"
+  homepage "https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster"
+  depends_on macos: ">= :sonoma"
+  preflight do
+    if MacOS.version < "14.4"
+      odie "FoFoBooster requires macOS 14.4 or later."
+    end
+  end
+  app "FoFoBooster.app"
+  uninstall quit: "com.sweetpapatechnologies.FoFoBooster",
+            login_item: "FoFoBooster"
+  zap trash: ["~/Library/Preferences/com.sweetpapatechnologies.FoFoBooster.plist",
+              "~/Library/Group Containers/6Y5SZ2K5XY.com.sweetpapatechnologies.FoFoBooster"]
+end

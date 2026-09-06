@@ -1,0 +1,9 @@
+{
+  "team": "6Y5SZ2K5XY",
+  "applicationIdentity": "Developer ID Application: Forrester Terry (6Y5SZ2K5XY)",
+  "installerIdentity": "Developer ID Installer: Forrester Terry (6Y5SZ2K5XY)",
+  "notaryProfile": "FoFoBooster-notary",
+  "sparkleAccount": "com.sweetpapatechnologies.FoFoBooster",
+  "githubRepository": "Sweet-Papa-Technologies/FoFo-Audio-Booster",
+  "githubEnvironment": "signing"
+}

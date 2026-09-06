@@ -1,0 +1,896 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "1.5 ms lookahead · 4× peak detection · Always on while processing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1.5 ms lookahead · 4× peak detection · Always on while processing"
+          }
+        }
+      }
+    },
+    "44,100 Hz": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "44,100 Hz"
+          }
+        }
+      }
+    },
+    "48,000 Hz": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "48,000 Hz"
+          }
+        }
+      }
+    },
+    "96,000 Hz": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "96,000 Hz"
+          }
+        }
+      }
+    },
+    "A boost helps quiet content. These checks help with the connection itself.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A boost helps quiet content. These checks help with the connection itself."
+          }
+        }
+      }
+    },
+    "A clearer connection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A clearer connection"
+          }
+        }
+      }
+    },
+    "A fresh canvas for your ears": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fresh canvas for your ears"
+          }
+        }
+      }
+    },
+    "A little louder. A lot clearer.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little louder. A lot clearer."
+          }
+        }
+      }
+    },
+    "A little quiet in here": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A little quiet in here"
+          }
+        }
+      }
+    },
+    "About": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
+          }
+        }
+      }
+    },
+    "Add an Audio Unit…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add an Audio Unit…"
+          }
+        }
+      }
+    },
+    "Added to the device’s reported latency. Adjust if Bluetooth visuals arrive early or late.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added to the device’s reported latency. Adjust if Bluetooth visuals arrive early or late."
+          }
+        }
+      }
+    },
+    "Allow up to +24 dB boost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow up to +24 dB boost"
+          }
+        }
+      }
+    },
+    "Approve in Login Items…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Approve in Login Items…"
+          }
+        }
+      }
+    },
+    "Audio Units only · The safety limiter always follows your effects. AUv2 effects run inside the app; AUv3 effects request a separate process. A render error bypasses the affected slot.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Audio Units only · The safety limiter always follows your effects. AUv2 effects run inside the app; AUv3 effects request a separate process. A render error bypasses the affected slot."
+          }
+        }
+      }
+    },
+    "Automatically check for updates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatically check for updates"
+          }
+        }
+      }
+    },
+    "Balance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balance"
+          }
+        }
+      }
+    },
+    "Boost a quiet app without turning up everything else. Set up system audio access to get started.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boost a quiet app without turning up everything else. Set up system audio access to get started."
+          }
+        }
+      }
+    },
+    "Boost is bypassed. Resume it to visualize system audio.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boost is bypassed. Resume it to visualize system audio."
+          }
+        }
+      }
+    },
+    "Boost, app levels, balance, mono, limiter, and effects follow the output device automatically.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boost, app levels, balance, mono, limiter, and effects follow the output device automatically."
+          }
+        }
+      }
+    },
+    "Bypass · ⌥⇧B": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bypass · ⌥⇧B"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
+          }
+        }
+      }
+    },
+    "Center": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Center"
+          }
+        }
+      }
+    },
+    "Check for Updates…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check for Updates…"
+          }
+        }
+      }
+    },
+    "Click a shortcut and press a key with Control, Option, or Command. Escape cancels. Panic bypass always restores the original audio.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Click a shortcut and press a key with Control, Option, or Command. Escape cancels. Panic bypass always restores the original audio."
+          }
+        }
+      }
+    },
+    "Current": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current"
+          }
+        }
+      }
+    },
+    "Dismiss error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dismiss error"
+          }
+        }
+      }
+    },
+    "FREE FOREVER  ·  MADE BY SWEET PAPA TECHNOLOGIES": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FREE FOREVER  ·  MADE BY SWEET PAPA TECHNOLOGIES"
+          }
+        }
+      }
+    },
+    "FoFoBooster": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FoFoBooster"
+          }
+        }
+      }
+    },
+    "FoFoBooster is in your menu bar.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FoFoBooster is in your menu bar."
+          }
+        }
+      }
+    },
+    "FoFoBooster · Fix issues": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FoFoBooster · Fix issues"
+          }
+        }
+      }
+    },
+    "FoFoBooster · Plugins": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FoFoBooster · Plugins"
+          }
+        }
+      }
+    },
+    "FoFoBooster · Visualizer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FoFoBooster · Visualizer"
+          }
+        }
+      }
+    },
+    "Free. No accounts, analytics, or audio uploads.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free. No accounts, analytics, or audio uploads."
+          }
+        }
+      }
+    },
+    "General": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        }
+      }
+    },
+    "Give your ears a breather": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Give your ears a breather"
+          }
+        }
+      }
+    },
+    "Global keyboard shortcuts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Global keyboard shortcuts"
+          }
+        }
+      }
+    },
+    "Got it": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got it"
+          }
+        }
+      }
+    },
+    "I understand — allow +24 dB": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I understand — allow +24 dB"
+          }
+        }
+      }
+    },
+    "Known source rate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Known source rate"
+          }
+        }
+      }
+    },
+    "Left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Left"
+          }
+        }
+      }
+    },
+    "Master boost": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Master boost"
+          }
+        }
+      }
+    },
+    "Match quiet content to a loudness target": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Match quiet content to a loudness target"
+          }
+        }
+      }
+    },
+    "Mono audio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mono audio"
+          }
+        }
+      }
+    },
+    "NOW PLAYING": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NOW PLAYING"
+          }
+        }
+      }
+    },
+    "No Audio Units found": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Audio Units found"
+          }
+        }
+      }
+    },
+    "No output device": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No output device"
+          }
+        }
+      }
+    },
+    "OUTPUT": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OUTPUT"
+          }
+        }
+      }
+    },
+    "Open FoFoBooster when I log in": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open FoFoBooster when I log in"
+          }
+        }
+      }
+    },
+    "Open Privacy Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Privacy Settings"
+          }
+        }
+      }
+    },
+    "Open at login": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open at login"
+          }
+        }
+      }
+    },
+    "Original": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Original"
+          }
+        }
+      }
+    },
+    "Output device": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output device"
+          }
+        }
+      }
+    },
+    "Peak protection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peak protection"
+          }
+        }
+      }
+    },
+    "Play something in an app to give it a boost.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play something in an app to give it a boost."
+          }
+        }
+      }
+    },
+    "Profiles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profiles"
+          }
+        }
+      }
+    },
+    "Quit FoFoBooster": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit FoFoBooster"
+          }
+        }
+      }
+    },
+    "Reduce Motion is on": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reduce Motion is on"
+          }
+        }
+      }
+    },
+    "Reported path latency": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reported path latency"
+          }
+        }
+      }
+    },
+    "Reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "Reset profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset profile"
+          }
+        }
+      }
+    },
+    "Restore defaults": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restore defaults"
+          }
+        }
+      }
+    },
+    "Restores original audio, removes the login item and saved profiles, and moves the app to the Trash.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restores original audio, removes the login item and saved profiles, and moves the app to the Trash."
+          }
+        }
+      }
+    },
+    "Resume boost to load and edit your effects.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume boost to load and edit your effects."
+          }
+        }
+      }
+    },
+    "Right": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Right"
+          }
+        }
+      }
+    },
+    "S": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S"
+          }
+        }
+      }
+    },
+    "Sample rate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sample rate"
+          }
+        }
+      }
+    },
+    "Saved output devices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved output devices"
+          }
+        }
+      }
+    },
+    "Set up FoFoBooster": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set up FoFoBooster"
+          }
+        }
+      }
+    },
+    "Shape your sound": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shape your sound"
+          }
+        }
+      }
+    },
+    "Shortcuts": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shortcuts"
+          }
+        }
+      }
+    },
+    "Sound": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sound"
+          }
+        }
+      }
+    },
+    "Start with an Apple effect, or add one of your installed Audio Units.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start with an Apple effect, or add one of your installed Audio Units."
+          }
+        }
+      }
+    },
+    "Still quiet at maximum volume? Some headphones limit their own output. Digital boost can help quiet content, but it cannot override the headset’s firmware.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Still quiet at maximum volume? Some headphones limit their own output. Digital boost can help quiet content, but it cannot override the headset’s firmware."
+          }
+        }
+      }
+    },
+    "Switch to built-in microphone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch to built-in microphone"
+          }
+        }
+      }
+    },
+    "This effect has no editable parameters.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This effect has no editable parameters."
+          }
+        }
+      }
+    },
+    "Undo microphone change": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Undo microphone change"
+          }
+        }
+      }
+    },
+    "Uninstall": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall"
+          }
+        }
+      }
+    },
+    "Uninstall FoFoBooster…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uninstall FoFoBooster…"
+          }
+        }
+      }
+    },
+    "Updates become available in signed releases.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates become available in signed releases."
+          }
+        }
+      }
+    },
+    "Using your headset’s microphone can switch playback to a low-bandwidth call profile. Switch to your Mac’s microphone to let stereo audio return.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Using your headset’s microphone can switch playback to a low-bandwidth call profile. Switch to your Mac’s microphone to let stereo audio return."
+          }
+        }
+      }
+    },
+    "Visualizer preset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizer preset"
+          }
+        }
+      }
+    },
+    "Visualizer sync": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visualizer sync"
+          }
+        }
+      }
+    },
+    "Welcome to FoFoBooster": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Welcome to FoFoBooster"
+          }
+        }
+      }
+    },
+    "Your first profile is saved when you adjust a level.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your first profile is saved when you adjust a level."
+          }
+        }
+      }
+    },
+    "Your headphones are in call mode. Fix →": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your headphones are in call mode. Fix →"
+          }
+        }
+      }
+    },
+    "Your sound, with more room.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your sound, with more room."
+          }
+        }
+      }
+    },
+    "You’ve been using a higher boost for a while. A lower level or a short listening break can help protect your hearing.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You’ve been using a higher boost for a while. A lower level or a short listening break can help protect your hearing."
+          }
+        }
+      }
+    },
+    "dB": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "dB"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

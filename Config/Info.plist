@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>CFBundleName</key><string>FoFoBooster</string>
+<key>CFBundleDisplayName</key><string>FoFoBooster</string>
+<key>CFBundleExecutable</key><string>FoFoBooster</string>
+<key>CFBundleIdentifier</key><string>com.sweetpapatechnologies.FoFoBooster</string>
+<key>CFBundleIconFile</key><string>AppIcon</string>
+<key>CFBundlePackageType</key><string>APPL</string>
+<key>CFBundleShortVersionString</key><string>0.1.0</string>
+<key>CFBundleVersion</key><string>1</string>
+<key>LSMinimumSystemVersion</key><string>14.4</string>
+<key>LSUIElement</key><true/>
+<key>NSHighResolutionCapable</key><true/>
+<key>NSAudioCaptureUsageDescription</key><string>FoFoBooster processes sound from your apps to boost quiet audio and show a visualizer. Audio stays on your Mac and is never recorded or uploaded.</string>
+<key>CFBundleURLTypes</key><array><dict><key>CFBundleURLName</key><string>FoFoBooster controls</string><key>CFBundleURLSchemes</key><array><string>fofobooster</string></array></dict></array>
+<key>SUEnableAutomaticChecks</key><true/>
+<key>SUFeedURL</key><string>https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/releases/latest/download/appcast.xml</string>
+<key>NSHumanReadableCopyright</key><string>Copyright © 2026 Sweet Papa Technologies. Apache License 2.0.</string>
+</dict></plist>

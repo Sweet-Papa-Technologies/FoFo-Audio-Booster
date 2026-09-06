@@ -1,0 +1,34 @@
+name: macOS checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: DSP, routing, persistence, shaders, and metadata
+        run: scripts/test.sh
+      - name: Build universal app and widget
+        run: xcodebuild -project FoFoBooster.xcodeproj -scheme FoFoBooster -configuration Release -derivedDataPath .build/xcode -clonedSourcePackagesDirPath .build/packages CODE_SIGNING_ALLOWED=NO ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO build
+      - name: Verify universal binaries and package without secrets
+        run: |
+          lipo .build/xcode/Build/Products/Release/FoFoBooster.app/Contents/MacOS/FoFoBooster -verify_arch arm64 x86_64
+          lipo .build/xcode/Build/Products/Release/FoFoBooster.app/Contents/PlugIns/FoFoBoosterWidget.appex/Contents/MacOS/FoFoBoosterWidget -verify_arch arm64 x86_64
+          mkdir -p build/artifacts
+          ditto -c -k --keepParent .build/xcode/Build/Products/Release/FoFoBooster.app build/artifacts/FoFoBooster-unsigned.zip
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: FoFoBooster-unsigned-development
+          path: build/artifacts/FoFoBooster-unsigned.zip
+          retention-days: 7

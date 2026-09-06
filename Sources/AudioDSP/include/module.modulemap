@@ -1,0 +1,4 @@
+module AudioDSP {
+    header "AudioDSP.h"
+    export *
+}
