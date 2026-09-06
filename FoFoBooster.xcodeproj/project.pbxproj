@@ -94,6 +94,12 @@
 			"path" = "Sources/FoFoBooster/Services/Resources.swift";
 			"sourceTree" = "<group>";
 		};
+		"9258A4D8692D2E0B21AEA8CA" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "sourcecode.swift";
+			"path" = "Sources/FoFoBooster/Services/VisualizerValidation.swift";
+			"sourceTree" = "<group>";
+		};
 		"2694399EEFDFDED751C44938" = {
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
@@ -158,6 +164,12 @@
 			"isa" = "PBXFileReference";
 			"lastKnownFileType" = "sourcecode.swift";
 			"path" = "Widget/FoFoBoosterWidget.swift";
+			"sourceTree" = "<group>";
+		};
+		"BCB338BF6A2FB49A0486CA60" = {
+			"isa" = "PBXFileReference";
+			"lastKnownFileType" = "text";
+			"path" = "LICENSE";
 			"sourceTree" = "<group>";
 		};
 		"E2B8D26DCAE568DA8E39D5DB" = {
@@ -351,6 +363,10 @@
 			"isa" = "PBXBuildFile";
 			"fileRef" = "4069686C7C34CDC18B6B804E";
 		};
+		"EAF3DDB575760463022DF4F6" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "9258A4D8692D2E0B21AEA8CA";
+		};
 		"632F8DA7F9198735A01C5990" = {
 			"isa" = "PBXBuildFile";
 			"fileRef" = "2694399EEFDFDED751C44938";
@@ -410,6 +426,7 @@
 				"FB46203D4DCC22292A22F1F7",
 				"488D053AD14790230C379563",
 				"775A146821AB2A4421977D07",
+				"EAF3DDB575760463022DF4F6",
 				"632F8DA7F9198735A01C5990",
 				"3E2A216F9C31018E33D146E6",
 				"C063A512BC26E332AF6B32D3",
@@ -422,6 +439,10 @@
 				"8A256EAF401D4846F3CC7BB7",
 			);
 			"runOnlyForDeploymentPostprocessing" = "0";
+		};
+		"8AE9BB41AB32F2DB6906EE2F" = {
+			"isa" = "PBXBuildFile";
+			"fileRef" = "BCB338BF6A2FB49A0486CA60";
 		};
 		"8F803DB2BA2B3F1E24CE667B" = {
 			"isa" = "PBXBuildFile";
@@ -439,6 +460,7 @@
 			"isa" = "PBXResourcesBuildPhase";
 			"buildActionMask" = "2147483647";
 			"files" = (
+				"8AE9BB41AB32F2DB6906EE2F",
 				"8F803DB2BA2B3F1E24CE667B",
 				"65898460A503896744B0F27D",
 				"61CD4F6CDBC8B5DFBC93BBAC",
@@ -793,6 +815,7 @@
 				"74CA69CDBF24B000FDB62074",
 				"DA29E89532AA56CB85208803",
 				"4069686C7C34CDC18B6B804E",
+				"9258A4D8692D2E0B21AEA8CA",
 				"2694399EEFDFDED751C44938",
 				"3FE09BD5C6EAAF54CBB3F38B",
 				"CB6D9A8A492C48010291136F",
@@ -804,6 +827,7 @@
 				"8EFF8CF27C727E556D9C6BDB",
 				"278732003FCA32305DACE849",
 				"0DEFE9AF6D0507140BD7525A",
+				"BCB338BF6A2FB49A0486CA60",
 				"E2B8D26DCAE568DA8E39D5DB",
 				"0E867AF17335A280DFA1D98F",
 				"89C88A96505D03A8142EBEEE",

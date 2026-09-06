@@ -46,8 +46,10 @@ build/FoFoBooster.app/Contents/MacOS/FoFoBooster --diagnostics
 build/FoFoBooster.app/Contents/MacOS/FoFoBooster --validate-audio
 # Automated isolated effect/state/fatal-crash test:
 build/FoFoBooster.app/Contents/MacOS/FoFoBooster --validate-effects
-# Optional non-disruptive soak; observes externally initiated device changes:
-build/FoFoBooster.app/Contents/MacOS/FoFoBooster --soak 86400
+# All five production shaders at 4K in both appearances:
+build/FoFoBooster.app/Contents/MacOS/FoFoBooster --validate-visualizer
+# Background 24-hour soak; restarts only its own quiet test source:
+python3 scripts/start-soak.py --app build/FoFoBooster.app
 # Render the menu panel with isolated sample data, without audio processing:
 build/FoFoBooster.app/Contents/MacOS/FoFoBooster --snapshot "$PWD/build/MenuPanel.png"
 ```

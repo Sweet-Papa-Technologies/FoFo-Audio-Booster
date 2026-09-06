@@ -5,12 +5,13 @@ import CoreAudio
 
 @MainActor
 enum AudioValidation {
-    static var active: Bool { ["--validate-audio", "--validate-effects", "--soak"].contains { CommandLine.arguments.contains($0) } }
+    static var active: Bool { ["--validate-audio", "--validate-effects", "--validate-visualizer", "--soak"].contains { CommandLine.arguments.contains($0) } }
     static func run() {
         _ = NSApplication.shared; NSApp.setActivationPolicy(.accessory)
         Task { @MainActor in
             do {
-                if CommandLine.arguments.contains("--validate-effects") { try await effects() }
+                if CommandLine.arguments.contains("--validate-visualizer") { try VisualizerValidation.run() }
+                else if CommandLine.arguments.contains("--validate-effects") { try await effects() }
                 else { try await audio() }
                 exit(0)
             } catch { print("VALIDATION FAILED: \(error.localizedDescription)"); fflush(stdout); exit(1) }
@@ -56,9 +57,9 @@ enum AudioValidation {
         guard var device = OutputDevice.discover().first(where: { $0.id == HAL.defaultOutput() }) else { throw AudioFailure(operation: "No current output device") }
         let originalOutput = device.id
         report(["event":"starting", "mode":duration > 3 ? "soak" : "audio-spike", "device":device.name, "rate":device.sampleRate, "capture":"permission may be requested", "sourceDBFS":-90.46, "durationSeconds":duration])
-        let (source, processID) = try await startSource(duration: duration + 60)
+        var (source, processID) = try await startSource(duration: duration + 60)
         defer { if source.isRunning { source.terminate() } }
-        let plan = [SourcePlan(key: "validation", processes: [processID], exclusive: false)]
+        var plan = [SourcePlan(key: "validation", processes: [processID], exclusive: false)]
         let observer = TapGraph(plan: plan, analysisOnly: true)
         do { try await observer.start(device: device, profile: DeviceProfile(), cap: 12, analyze: true) }
         catch { observer.stop(); throw error }
@@ -81,8 +82,23 @@ enum AudioValidation {
         var usageStart = rusage(); getrusage(RUSAGE_SELF, &usageStart)
         var previousCallbacks: UInt64 = graph.meters.callbacks, stalls = 0, rebuilds = 0, failures: UInt32 = 0
         var lastRate = device.sampleRate, lastOutput = device.id
+        let relaunchInterval = CommandLine.arguments.contains("--relaunch-every") ? seconds("--relaunch-every", fallback: 300) : Double.infinity
+        var nextRelaunch = relaunchInterval, relaunches = 0
         while ProcessInfo.processInfo.systemUptime-start < duration {
             try await Task.sleep(for: .seconds(1))
+            let elapsed = ProcessInfo.processInfo.systemUptime-start
+            if elapsed >= nextRelaunch {
+                graph.stop()
+                if source.isRunning { source.terminate() }
+                (source, processID) = try await startSource(duration: max(60, duration-elapsed+60))
+                plan = [SourcePlan(key: "validation", processes: [processID], exclusive: false)]
+                graph = TapGraph(plan: plan)
+                try await graph.start(device: device, profile: profile, cap: 12, analyze: true)
+                let restoredPeak = try await peak(graph, duration: 0.4)
+                try require(restoredPeak > 1e-9, "Relaunched source did not recover")
+                previousCallbacks = 0; stalls = 0; relaunches += 1; nextRelaunch += relaunchInterval
+                report(["event":"source-relaunched", "count":relaunches, "elapsedSeconds":elapsed])
+            }
             let current = OutputDevice.discover().first { $0.id == HAL.defaultOutput() }
             let meters = graph.meters
             stalls = meters.callbacks == previousCallbacks ? stalls+1 : 0; previousCallbacks = meters.callbacks
@@ -111,31 +127,42 @@ enum AudioValidation {
         var usageEnd = rusage(); getrusage(RUSAGE_SELF, &usageEnd)
         func cpu(_ value: rusage) -> Double { Double(value.ru_utime.tv_sec + value.ru_stime.tv_sec) + Double(value.ru_utime.tv_usec + value.ru_stime.tv_usec)/1e6 }
         let elapsed = ProcessInfo.processInfo.systemUptime-start
-        report(["event":"passed", "elapsedSeconds":elapsed, "cpuPercent":100*(cpu(usageEnd)-cpu(usageStart))/elapsed, "maxRSSMiB":Double(usageEnd.ru_maxrss)/1048576, "overruns":failures, "rebuilds":rebuilds, "bypassMS":bypassMS, "objectsReleased":true, "scope":"engine process with validation source; no device switches were initiated"])
+        report(["event":"passed", "elapsedSeconds":elapsed, "cpuPercent":100*(cpu(usageEnd)-cpu(usageStart))/elapsed, "maxRSSMiB":Double(usageEnd.ru_maxrss)/1048576, "overruns":failures, "rebuilds":rebuilds, "sourceRelaunches":relaunches, "bypassMS":bypassMS, "objectsReleased":true, "scope":"engine process with validation source; no device switches were initiated"])
         try require(failures == 0, "The audio callback reported deadline overruns")
     }
     static func effects() async throws {
-        guard let effect = PluginHost.discover().first(where: { $0.description.componentSubType == kAudioUnitSubType_NBandEQ && $0.description.componentManufacturer == kAudioUnitManufacturer_Apple }), let engine = ff_create(48000, 1, 0, false) else { throw AudioFailure(operation: "Apple EQ or DSP unavailable") }
-        let host = PluginHost()
-        let slot = effect.slot
-        defer { host.stop(); ff_destroy(engine) }
-        var failure: Int?
-        host.onFailure = { slot, _ in failure = slot }
-        try await host.prepare([slot], rate: 48000, bufferFrames: 128, engine: engine)
-        var left = [Float](repeating: 0.01, count: 128), right = left, outLeft = left, outRight = left
-        for _ in 0..<100 { ff_process(engine, &left, &right, &outLeft, &outRight, 128); try await Task.sleep(for: .milliseconds(5)) }
-        await host.captureState()
-        try require(host.snapshot([slot]).first?.state != nil, "The worker did not return plugin state")
-        guard let bridge = host.bridge else { throw AudioFailure(operation: "Worker bridge missing") }
-        ff_bridge_test_fault(bridge, 0)
-        for _ in 0..<100 {
-            ff_process(engine, &left, &right, &outLeft, &outRight, 128)
-            try require(outLeft.allSatisfy { $0.isFinite && abs($0) <= 0.892 }, "Invalid output after plugin crash")
-            try await Task.sleep(for: .milliseconds(5))
-            if failure != nil { break }
+        let available = PluginHost.discover()
+        for subtype in [kAudioUnitSubType_NBandEQ, kAudioUnitSubType_DynamicsProcessor, kAudioUnitSubType_PeakLimiter, kAudioUnitSubType_NewTimePitch] {
+            guard let effect = available.first(where: { $0.description.componentSubType == subtype && $0.description.componentManufacturer == kAudioUnitManufacturer_Apple }), let engine = ff_create(48000, 1, 0, false) else { throw AudioFailure(operation: "Required Apple preset or DSP unavailable") }
+            let host = PluginHost(), slot = effect.slot
+            defer { host.stop(); ff_destroy(engine) }
+            var failure: Int?
+            host.onFailure = { index, _ in failure = index ?? -1 }
+            try await host.prepare([slot], rate: 48000, bufferFrames: 128, engine: engine)
+            var left = [Float](repeating: 0.01, count: 128), right = left, outLeft = left, outRight = left
+            for _ in 0..<100 { ff_process(engine, &left, &right, &outLeft, &outRight, 128); try await Task.sleep(for: .milliseconds(5)) }
+            await host.captureState()
+            try require(failure == nil, "The effect failed before fault injection")
+            try require(outLeft.allSatisfy { $0.isFinite } && outLeft.contains { abs($0) > 1e-6 }, "The effect did not render valid audio")
+            let saved = host.snapshot([slot])
+            try require(saved.first?.state != nil, "The worker did not return plugin state")
+            guard let bridge = host.bridge else { throw AudioFailure(operation: "Worker bridge missing") }
+            ff_bridge_test_fault(bridge, 0)
+            for _ in 0..<100 {
+                ff_process(engine, &left, &right, &outLeft, &outRight, 128)
+                try require(outLeft.allSatisfy { $0.isFinite && abs($0) <= 0.892 }, "Invalid output after plugin crash")
+                try await Task.sleep(for: .milliseconds(5))
+                if failure != nil { break }
+            }
+            try require(failure == 0, "The worker crash was not attributed to its effect")
+            ff_attach_remote(engine, nil); host.stop()
+            failure = nil
+            try await host.prepare(saved, rate: 48000, bufferFrames: 128, engine: engine)
+            for _ in 0..<30 { ff_process(engine, &left, &right, &outLeft, &outRight, 128); try await Task.sleep(for: .milliseconds(5)) }
+            try require(failure == nil, "Restoring the saved effect state failed")
+            AudioValidation.report(["event":"preset-passed", "preset":effect.name, "parentSurvived":true, "dryFallback":true, "stateRestored":true])
         }
-        try require(failure == 0, "The worker crash was not attributed to its effect")
-        report(["event":"passed", "mode":"effects", "parentSurvived":true, "failedSlot":failure ?? -1, "dryFallback":true, "stateRoundTrip":true])
+        report(["event":"passed", "mode":"effects", "presets":4, "parentSurvived":true, "dryFallback":true, "stateRoundTrip":true])
     }
     static func source() {
         _ = NSApplication.shared; NSApp.setActivationPolicy(.accessory)
@@ -148,9 +175,13 @@ enum AudioValidation {
         func play() { do { try engine.start(); player.scheduleBuffer(buffer, at: nil, options: [.loops]); player.play() } catch { exit(2) } }
         play()
         let observer = NotificationCenter.default.addObserver(forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main) { _ in Task { @MainActor in player.stop(); play() } }
+        let parentPID = getppid()
+        let parentTimer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if getppid() != parentPID { player.stop(); engine.stop(); exit(0) }
+        }
         let duration = seconds("--validation-source", fallback: 60)
         DispatchQueue.main.asyncAfter(deadline: .now()+duration) { player.stop(); engine.stop(); NotificationCenter.default.removeObserver(observer); exit(0) }
         NSApp.run()
-        withExtendedLifetime((engine,player,buffer,observer)) {}
+        withExtendedLifetime((engine,player,buffer,observer,parentTimer)) {}
     }
 }

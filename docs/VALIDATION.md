@@ -9,8 +9,10 @@ Status: development preview, September 5, 2026. A signed per-app capture/gain/cl
 - Fourteen XCTest cases pass: no-op routing, selective app routing, disjoint master coverage, solo coverage, helper aliases, profile/state persistence, corrupt-preference fallback, gain caps, processing activation, Bluetooth call-profile classification, and four monotonic listening-duration/continuity/dismissal cases.
 - DSP tests pass at 44.1, 48, 96, and 192 kHz under +24 dB gain. Independent 16× reconstructed peaks remain below the −1 dBTP ceiling for the test signals.
 - DSP tests cover K-weighted sine loudness, bounded sample delivery, balance, opposite-phase mono cancellation, non-finite sample containment, fade-out, input bounds, an exact delay-compensated unity null test, actual IOProc buffer mapping/series gains, monitor exclusion, and a real Apple AU render failure.
-- The actual Swift plugin worker passes Apple EQ state round-trip and forced fatal-crash containment; C++ tests additionally freeze the worker and verify delayed dry fallback and shared-memory cleanup. The parent also survives closing a dead worker's command pipe.
+- The actual Swift plugin worker passes EQ, Dynamics, Peak Limiter, and NewTimePitch render/state-restoration/fatal-crash containment; C++ tests additionally freeze the worker and verify delayed dry fallback and shared-memory cleanup. The parent also survives closing a dead worker's command pipe.
 - SPT-signed live capture on macOS 15.5, External Headphones, 44.1 kHz: +3 dB requested → +3.000012 dB measured, zero callback overruns, private objects released, real default output unchanged. Brief engine-process measurement: 0.784% CPU, 26.67 MiB maximum RSS, 7.61 ms synchronous bypass teardown. This is not a full GUI performance or Bluetooth qualification.
+- Two-minute signed engine run with four isolated test-source relaunches: zero reported overruns, 0.886% CPU, 26.25 MiB maximum RSS, all private objects released.
+- Offscreen production Metal shaders render all five presets at 3840×2160 in both appearances on Apple M4 Pro; measured GPU frame times below 0.85 ms in the benchmark. This excludes the compositor, FFT, and engine, so it does not certify full-window GPU percentage. Tide uses retained/blurred phosphor buffers; Grid has peak-hold dots.
 - Metal shader compiles. Native app diagnostics discover real output devices, active process groups, installed Audio Units, and Metal without requesting capture.
 - The app's isolated menu-panel snapshot renders with sample values. This is UI validation, not evidence of active audio processing.
 
@@ -33,7 +35,7 @@ Status: development preview, September 5, 2026. A signed per-app capture/gain/cl
 | N1–N3 | Path latency is estimated from reported device/AU values. ≤10 ms, <1% CPU/<60 MB, and a 24-hour no-dropout soak are not certified. |
 | N4 | No-tap no-op routing and active low-level delay-compensated null tests pass. End-to-end device null testing remains. |
 | N5–N6 | No analytics/recording/network client beyond configured Sparkle. English String Catalog and Xcode extraction enabled; complete localization/accessibility audit remains. |
-| Distribution | Universal app/widget builds; archive, signing, notarization, appcast, DMG, cask generators ready. SPT identities, validated local Keychain notarization profile, Sparkle key, and protected GitHub signing environment configured. Actual notarization/cloud-run results are recorded below; publication remains separate. |
+| Distribution | Universal app/widget builds; archive, signing, notarization, appcast, DMG, cask generators ready. SPT identities, validated local Keychain notarization profile, Sparkle key, and protected GitHub signing environment configured. Local app, DMG, and PKG accepted by Apple and stapled; Gatekeeper passes. GitHub CI and signed-build workflow both pass. Publication remains separate. |
 
 ## Live-audio spike checklist
 
@@ -52,3 +54,15 @@ Use a consistently signed installed build; start with low headphone/system volum
 11. Validate VoiceOver, keyboard focus, customized hotkeys/conflicts, Reduced Motion/Transparency, Notification Center interaction, launch-at-login opt-in, and uninstall on a disposable installed build.
 
 Do not publish a stable release until these gates are recorded. Name/trademark availability and license changes in the original open questions remain product decisions.
+
+## Distribution evidence
+
+- [First GitHub macOS checks run](https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/actions/runs/34012835421): tests and universal app/widget build passed.
+- [First protected signing run](https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/actions/runs/34012845062): universal build, credential import, app/DMG/PKG notarization, stapling, Gatekeeper verification, appcast signing, artifact upload, and ephemeral Keychain cleanup passed.
+- Local notarization receipts, complete archives, cask, appcast and checksums are in ignored `build/release`. Later runs replace local artifacts; GitHub preserves each run separately. No stable release has been published.
+
+## Repeatable non-disruptive qualification
+
+`--validate-audio` uses a separate −90.46 dBFS test source, verifies +3 dB processing against an observer tap, checks callback overruns, destroys private objects, and verifies the default output remains unchanged. `--validate-effects` renders and restores all four Apple presets, deliberately kills their worker, and verifies protected dry fallback. `--validate-visualizer` executes production shaders offscreen at 4K for both appearances and reports GPU timing. None of these records audio or captures the screen.
+
+`scripts/start-soak.py` copies the signed build into its own run directory and starts a 24-hour engine soak, restarting only its own source every five minutes. It records progress/PID/stop instructions under `build/soak`. The source exits when its parent exits. Device changes initiated externally are observed and recovered; the harness never switches hardware or sleeps the Mac itself. A running soak is not a passed soak. The required Bluetooth/sleep/wake sequence still needs a dedicated or explicitly available test Mac, and DRM, VoiceOver, widget/Shortcuts, clean-machine installation/update/uninstall remain manual acceptance checks.

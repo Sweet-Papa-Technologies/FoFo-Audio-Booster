@@ -14,13 +14,16 @@ final class SpectrumAnalyzer {
     private var weighted = [Float](repeating: 0, count: 2048)
     private var pending: [(Double, [Float], [Float])] = []
     private(set) var bins = [Float](repeating: 0, count: 64)
+    private(set) var peaks = [Float](repeating: 0, count: 64)
+    private var peakUntil = [Double](repeating: 0, count: 64)
+    private var previousDisplayTime = ProcessInfo.processInfo.systemUptime
     private(set) var waveform = [Float](repeating: 0, count: 64)
     private(set) var flux: Float = 0
     private(set) var centroid: Float = 0
     private var last = [Float](repeating: 0, count: 64)
     init() { vDSP_hann_window(&window, vDSP_Length(size), Int32(vDSP_HANN_NORM)) }
     deinit { vDSP_destroy_fftsetup(setup) }
-    func reset() { bins = .init(repeating: 0, count: 64); waveform = bins; pending.removeAll() }
+    func reset() { bins = .init(repeating: 0, count: 64); waveform = bins; peaks = bins; last = bins; peakUntil = .init(repeating: 0, count: 64); flux = 0; centroid = 0; pending.removeAll(); previousDisplayTime = ProcessInfo.processInfo.systemUptime }
     func consume(dsp: OpaquePointer, sampleRate: Double, delayMS: Double) {
         let count = Int(ff_read_samples(dsp, &incoming, UInt32(incoming.count)))
         guard count > 0 else { return }
@@ -52,6 +55,11 @@ final class SpectrumAnalyzer {
         let time = ProcessInfo.processInfo.systemUptime
         pending.append((time + delayMS/1000, next, wave))
         while let first = pending.first, first.0 <= time { bins = first.1; waveform = first.2; pending.removeFirst() }
+        let elapsed = Float(min(time-previousDisplayTime, 0.1)); previousDisplayTime = time
+        for index in 0..<64 {
+            if bins[index] >= peaks[index] { peaks[index] = bins[index]; peakUntil[index] = time+0.6 }
+            else if time > peakUntil[index] { peaks[index] = max(bins[index], peaks[index]-elapsed*0.45) }
+        }
         if pending.count > 90 { pending.removeFirst(pending.count-90) }
     }
 }

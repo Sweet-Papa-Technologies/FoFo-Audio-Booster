@@ -50,7 +50,9 @@ def main():
     for archive in [dmg,pkg]:run(['xcrun','stapler','staple',archive]);run(['xcrun','stapler','validate',archive])
     run(['spctl','--assess','--type','execute','--verbose=2',app])
     run(['pkgutil','--check-signature',pkg])
-    feed=OUT/'feed';feed.mkdir(exist_ok=True);shutil.copy2(dmg,feed/dmg.name)
+    feed=OUT/'feed'
+    if feed.exists():shutil.rmtree(feed)
+    feed.mkdir();shutil.copy2(dmg,feed/dmg.name)
     sparkle=ROOT/'.build/packages/artifacts/sparkle/Sparkle/bin'
     if os.environ.get('SPARKLE_PRIVATE_KEY'):
         signing=['--ed-key-file','-'];secret_input=os.environ['SPARKLE_PRIVATE_KEY'].encode()+b'\n'

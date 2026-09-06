@@ -104,7 +104,7 @@ private struct MetalSurface: NSViewRepresentable {
             guard let descriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable, let pipeline, let command = queue?.makeCommandBuffer() else { return }
             let accent = NSColor.controlAccentColor.usingColorSpace(.deviceRGB) ?? .systemOrange
             var uniforms: [Float] = [Float(view.drawableSize.width), Float(view.drawableSize.height), Float(ProcessInfo.processInfo.systemUptime-started), Float(preset.index), light ? 1 : 0, quality, model.analyzer.flux, model.analyzer.centroid, Float(accent.redComponent), Float(accent.greenComponent), Float(accent.blueComponent), driftClock, delta, historyValid ? 1 : 0]
-            var bins = model.analyzer.bins, wave = model.analyzer.waveform
+            var bins = model.analyzer.bins, wave = model.analyzer.waveform, peaks = model.analyzer.peaks
             var tideTexture: MTLTexture?
             if preset == .tide, let device = view.device, let tidePipeline {
                 let width = max(1, Int(view.drawableSize.width) / 2), height = max(1, Int(view.drawableSize.height) / 2)
@@ -136,6 +136,7 @@ private struct MetalSurface: NSViewRepresentable {
             encoder.setFragmentBytes(&uniforms, length: uniforms.count * 4, index: 0)
             encoder.setFragmentBytes(&bins, length: bins.count * 4, index: 1)
             encoder.setFragmentBytes(&wave, length: wave.count * 4, index: 2)
+            encoder.setFragmentBytes(&peaks, length: peaks.count * 4, index: 3)
             if preset == .drift {
                 encoder.setVertexBytes(&uniforms, length: uniforms.count * 4, index: 0)
                 encoder.setVertexBytes(&bins, length: bins.count * 4, index: 1)

@@ -5,7 +5,7 @@ vertex Vertex fullscreenVertex(uint id [[vertex_id]]) {
     float2 p=float2((id<<1)&2,id&2); return {float4(p*2-1,0,1),p};
 }
 float hash(float n) { return fract(sin(n*127.1)*43758.5453); }
-fragment float4 visualizerFragment(Vertex in [[stage_in]], constant float *u [[buffer(0)]], constant float *bins [[buffer(1)]], constant float *wave [[buffer(2)]]) {
+fragment float4 visualizerFragment(Vertex in [[stage_in]], constant float *u [[buffer(0)]], constant float *bins [[buffer(1)]], constant float *wave [[buffer(2)]], constant float *peaks [[buffer(3)]]) {
     float2 uv=in.uv, p=(uv-.5)*float2(u[0]/max(u[1],1.),1.);
     float t=u[2], mode=u[3], light=u[4]; float3 accent=float3(u[8],u[9],u[10]);
     float3 bg=mix(float3(.022,.027,.035),float3(.93,.94,.96),light);
@@ -33,7 +33,8 @@ fragment float4 visualizerFragment(Vertex in [[stage_in]], constant float *u [[b
         float height=bins[i]*13.+1.+.35*sin(t*.3+cell.x*.2);
         float fill=smoothstep(.5,-.5,cell.y-height);
         float led=smoothstep(.46,.33,length((fract(q)-.5)*float2(.8,1.)));
-        glow=led*(.06+fill*.85);color=mix(accent,float3(1.,.55,.15),cell.y/16.);
+        float peakDot=1.-smoothstep(.25,.65,abs(cell.y-floor(peaks[i]*13.+1.)));
+        glow=led*(.06+fill*.7+peakDot*.35);color=mix(accent,float3(1.,.55,.15),cell.y/16.);
     }
     float3 result=mix(bg+color*glow,bg-color*glow*.55,light);
     return float4(clamp(result,0.,1.),1.);
@@ -62,14 +63,14 @@ fragment float4 particleFragment(Particle in [[stage_in]]) {
 // time so persistence remains consistent at 30 and 60 fps; no captured audio is stored.
 fragment half tideHistory(Vertex in [[stage_in]], constant float *u [[buffer(0)]], constant float *wave [[buffer(2)]], texture2d<half> previous [[texture(0)]]) {
     constexpr sampler linearSampler(coord::normalized, address::clamp_to_edge, filter::linear);
-    float2 uv=in.uv, texel=1./float2(previous.get_width(),previous.get_height());
+    float2 uv=in.uv, sampleUV=float2(uv.x,1.-uv.y), texel=1./float2(previous.get_width(),previous.get_height());
     float old=0;
     if(u[13]>.5) {
-        old=float(previous.sample(linearSampler,uv).r)*.6;
-        old+=float(previous.sample(linearSampler,uv+float2(texel.x,0)).r)*.1;
-        old+=float(previous.sample(linearSampler,uv-float2(texel.x,0)).r)*.1;
-        old+=float(previous.sample(linearSampler,uv+float2(0,texel.y)).r)*.1;
-        old+=float(previous.sample(linearSampler,uv-float2(0,texel.y)).r)*.1;
+        old=float(previous.sample(linearSampler,sampleUV).r)*.6;
+        old+=float(previous.sample(linearSampler,sampleUV+float2(texel.x,0)).r)*.1;
+        old+=float(previous.sample(linearSampler,sampleUV-float2(texel.x,0)).r)*.1;
+        old+=float(previous.sample(linearSampler,sampleUV+float2(0,texel.y)).r)*.1;
+        old+=float(previous.sample(linearSampler,sampleUV-float2(0,texel.y)).r)*.1;
     }
     float x=clamp(uv.x,0.,.999)*63.;int i=min(int(x),62);
     float y=.5+mix(wave[i],wave[i+1],fract(x))*.25+sin(uv.x*10.+u[2]*.25)*.01;
@@ -78,7 +79,7 @@ fragment half tideHistory(Vertex in [[stage_in]], constant float *u [[buffer(0)]
 }
 fragment float4 tideDisplay(Vertex in [[stage_in]], constant float *u [[buffer(0)]], texture2d<half> history [[texture(0)]]) {
     constexpr sampler linearSampler(coord::normalized, address::clamp_to_edge, filter::linear);
-    float energy=float(history.sample(linearSampler,in.uv).r), light=u[4];
+    float energy=float(history.sample(linearSampler,float2(in.uv.x,1.-in.uv.y)).r), light=u[4];
     float3 color=mix(float3(u[8],u[9],u[10]),float3(.25,1.,.7),.65);
     float3 bg=mix(float3(.022,.027,.035),float3(.93,.94,.96),light);
     return float4(clamp(mix(bg+color*energy,bg-color*energy*.55,light),0.,1.),1.);

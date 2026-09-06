@@ -22,7 +22,7 @@ app_sources = [file(str(p.relative_to(root)), 'sourcecode.swift') for p in sorte
 app_sources += [file(str(p.relative_to(root)), 'sourcecode.cpp.cpp') for p in sorted((root/'Sources/AudioDSP').glob('*.cpp'))]
 shared = file('Shared/WidgetIntent.swift','sourcecode.swift')
 widget = file('Widget/FoFoBoosterWidget.swift','sourcecode.swift')
-resources = [file('Sources/FoFoBooster/Resources/AppIcon.icns','image.icns'),file('Sources/FoFoBooster/Resources/Visualizer.metal','text'),file('Sources/FoFoBooster/Resources/Localizable.xcstrings','text.json.xcstrings')]
+resources = [file('LICENSE','text'),file('Sources/FoFoBooster/Resources/AppIcon.icns','image.icns'),file('Sources/FoFoBooster/Resources/Visualizer.metal','text'),file('Sources/FoFoBooster/Resources/Localizable.xcstrings','text.json.xcstrings')]
 app_product = add('appProduct', isa='PBXFileReference', explicitFileType='wrapper.application', path='FoFoBooster.app', sourceTree='BUILT_PRODUCTS_DIR')
 widget_product = add('widgetProduct', isa='PBXFileReference', explicitFileType='wrapper.app-extension', path='FoFoBoosterWidget.appex', sourceTree='BUILT_PRODUCTS_DIR')
 frameworks=[]

@@ -29,13 +29,16 @@ final class PluginHost {
     var onFailure: ((Int?, String) -> Void)?
     var loadedCount: Int { isolatedSlots.count }
     static func discover() -> [AvailablePlugin] {
-        [kAudioUnitType_Effect, kAudioUnitType_MusicEffect].flatMap { type in
+        [kAudioUnitType_Effect, kAudioUnitType_MusicEffect, kAudioUnitType_FormatConverter].flatMap { type in
             AVAudioUnitComponentManager.shared().components(matching: AudioComponentDescription(componentType: type, componentSubType: 0, componentManufacturer: 0, componentFlags: 0, componentFlagsMask: 0))
+        }.filter {
+            let d = $0.audioComponentDescription
+            return d.componentType != kAudioUnitType_FormatConverter || (d.componentSubType == kAudioUnitSubType_NewTimePitch && d.componentManufacturer == kAudioUnitManufacturer_Apple)
         }.map { AvailablePlugin(name: $0.name, manufacturer: $0.manufacturerName, description: $0.audioComponentDescription) }.sorted { $0.name < $1.name }
     }
     func prepare(_ slots: [PluginSlot], rate: Double, bufferFrames: UInt32, engine: OpaquePointer) async throws {
         guard slots.contains(where: { !$0.bypass }) else { return }
-        cached = slots
+        cached = slots; previousMisses = 0
         let token = UUID(); epoch = token
         let bridgeName = "/ffb.\(UUID().uuidString.replacingOccurrences(of: "-", with: "").prefix(24))"
         guard let shared = ff_bridge_create(bridgeName) else { throw AudioFailure(operation: "Could not create isolated effect buffers") }
