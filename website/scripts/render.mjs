@@ -15,6 +15,11 @@ try {
     .screenshot({ path: "src/assets/social.png" });
   await page.setViewportSize({ width: 180, height: 180 });
   await page.goto(server.url + "/assets/icon.svg");
+  await page.locator("svg").evaluate((svg) => {
+    svg.setAttribute("width", "180");
+    svg.setAttribute("height", "180");
+    svg.style.background = "#f15b2b";
+  });
   await page.screenshot({
     path: "src/assets/apple-touch-icon.png",
     omitBackground: true,
