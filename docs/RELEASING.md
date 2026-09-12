@@ -46,3 +46,8 @@ The signing job imports the encrypted identities into an ephemeral Keychain, val
 Neither local scripts nor Actions publish releases. Complete the [hardware and user-interface acceptance gates](VALIDATION.md), review the artifacts, then publish the version's DMG, PKG, appcast, and checksums together. The appcast URLs refer to `releases/download/vVERSION/`; the updater reads `releases/latest/download/appcast.xml`. Test an actual upgrade on a clean Mac before announcing updates. Install the generated cask in the intended Homebrew tap after the release asset exists.
 
 Update both target versions, the generator's build settings, About label, and CHANGELOG before a new version. Preserve the existing Apache 2.0 license and stable bundle/signing identities for system-audio permission continuity.
+## Public downloads and website
+
+The signed macOS workflow now publishes a public GitHub release after successful signing on version tags, or on a manual run with `publish=true`. The default manual build still produces only CI artifacts. Publication validates checksums, accepted notary receipts, and appcast metadata, and refuses to replace an existing version. Bump the app version and build before creating the next tag on reviewed main history.
+
+Published assets include the signed DMG, PKG, ZIP, Sparkle appcast, SHA256SUMS, cask, and notary receipts. Completion of the signed workflow starts Website checks, which resolve current public download assets and prepare the site. Automatic Firebase deployment is prepared but awaits approval of its project-wide Hosting role; see [website deployment](../website/README.md). The first public 0.1.1 release reuses verified artifacts from signed run `34664620176` at `4a16402ff5adfa2b55293deac043f097dc6eb636`.

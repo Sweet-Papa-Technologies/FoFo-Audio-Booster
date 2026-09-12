@@ -1,0 +1,19 @@
+{
+  "name": "fofobooster-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "sync-release": "node scripts/sync-release.mjs",
+    "test": "node --test scripts/site.test.mjs",
+    "test:browser": "node scripts/browser-test.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0"
+  }
+}

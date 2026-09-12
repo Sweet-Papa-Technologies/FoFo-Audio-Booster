@@ -1,0 +1,113 @@
+name: Website
+on:
+  pull_request:
+    paths:
+      [
+        "website/**",
+        "firebase.json",
+        ".firebaserc",
+        ".github/workflows/website.yml",
+      ]
+  push:
+    branches: [main]
+    paths:
+      [
+        "website/**",
+        "firebase.json",
+        ".firebaserc",
+        ".github/workflows/website.yml",
+      ]
+  workflow_dispatch:
+  # Releases created with GITHUB_TOKEN don't emit another release workflow event.
+  workflow_run:
+    workflows: ["Signed macOS build"]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: website-${{ github.event.pull_request.number || 'production' }}
+  cancel-in-progress: false
+jobs:
+  check:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SITE_URL: ${{ vars.WEBSITE_URL || 'https://fofo-booster.web.app' }}
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          # Never execute a triggering workflow's unreviewed head in this workflow.
+          ref: ${{ github.event_name == 'pull_request' && github.ref || 'main' }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+      - run: npm ci
+        working-directory: website
+      - name: Resolve published download assets
+        if: github.event_name != 'pull_request'
+        run: npm run sync-release
+        working-directory: website
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - run: npm run build && npm test
+        working-directory: website
+      - run: npx playwright install --with-deps chromium
+        working-directory: website
+      - run: npm run test:browser
+        working-directory: website
+      - name: Preserve exactly the verified site and its deployment configuration
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: website
+          path: |
+            website/dist/
+            firebase.json
+          retention-days: 7
+      - name: Explain deployment state
+        if: github.event_name != 'pull_request' && vars.FIREBASE_HOSTING_ENABLED != 'true'
+        run: echo 'Website checks passed. Automatic Hosting deployment awaits approval of the dedicated service account’s project-level Hosting role.' >> "$GITHUB_STEP_SUMMARY"
+  deploy:
+    needs: check
+    if: github.repository == 'Sweet-Papa-Technologies/FoFo-Audio-Booster' && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.FIREBASE_HOSTING_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: website
+      url: https://fofo-booster.web.app
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: website
+          path: .
+      - name: Install pinned deployment CLI before requesting credentials
+        run: npm install --global firebase-tools@15.30.0
+      - name: Validate the sole deployment target
+        run: |
+          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const c=JSON.parse(fs.readFileSync('firebase.json')); assert.deepEqual(Object.keys(c),['hosting']); assert.equal(c.hosting.site,'fofo-booster'); assert.equal(c.hosting.public,'website/dist');"
+      - name: Authenticate with a short-lived GitHub identity
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          project_id: fofoapps-934be
+          workload_identity_provider: projects/851869525836/locations/global/workloadIdentityPools/fofo-booster-github/providers/github-main
+          service_account: fofo-booster-hosting@fofoapps-934be.iam.gserviceaccount.com
+      - name: Deploy FoFoBooster only
+        run: firebase deploy --only hosting --project fofoapps-934be --non-interactive
+      - name: Check the public site
+        run: |
+          curl --fail --retry 3 https://fofo-booster.web.app/ -o /tmp/booster-live.html
+          curl --fail --retry 3 https://fofo-booster.web.app/llms.txt -o /tmp/booster-llms.txt
+          echo 'Published https://fofo-booster.web.app' >> "$GITHUB_STEP_SUMMARY"

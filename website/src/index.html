@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      FoFoBooster — Free Mac Volume Booster &amp; Per-App Audio Control
+    </title>
+    <meta
+      name="description"
+      content="Give quiet Mac audio a lift. FoFoBooster is a free, open-source volume booster with per-app controls, Audio Unit effects, device profiles, and peak protection. macOS 14.4+."
+    />
+    <link rel="canonical" href="__SITE_URL__/" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="theme-color" content="#f6f3ec" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FoFoBooster" />
+    <meta property="og:title" content="Your Mac. A little louder." />
+    <meta
+      property="og:description"
+      content="Free Mac audio boost, per-app controls, and your favorite Audio Units. Small app. More of the sound you love."
+    />
+    <meta property="og:url" content="__SITE_URL__/" />
+    <meta property="og:image" content="__SITE_URL__/assets/social.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="FoFoBooster — Your Mac. A little louder. Free audio control for macOS."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="FoFoBooster — Your Mac. A little louder."
+    />
+    <meta
+      name="twitter:description"
+      content="A free, native Mac volume booster with per-app audio control and Audio Unit effects."
+    />
+    <meta name="twitter:image" content="__SITE_URL__/assets/social.png" />
+    <link rel="icon" href="/assets/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link
+      rel="alternate"
+      type="text/markdown"
+      href="/index.md"
+      title="FoFoBooster in Markdown"
+    />
+    <link rel="author" href="/humans.txt" />
+    <link rel="stylesheet" href="/assets/site.css" />
+    <script src="/assets/site.js" defer></script>
+    <script type="application/ld+json">
+      __STRUCTURED_DATA__
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="brand" href="/" aria-label="FoFoBooster home"
+        ><img src="/assets/icon.svg" width="36" height="36" alt="" /><span
+          >FoFo<span class="brand-light">Booster</span></span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#features">The good stuff</a><a href="#setup">Get started</a
+        ><a href="#faq">Questions?</a>
+      </nav>
+      <a class="button button-small button-dark" href="__DOWNLOAD_DMG__"
+        >Download <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">
+            <span class="status-dot"></span> A LITTLE UTILITY. A BIG DIFFERENCE.
+          </p>
+          <h1 id="hero-heading">
+            Your Mac.<br />A little <span class="orange">louder.</span>
+          </h1>
+          <p class="hero-description">
+            Quiet video? Soft-spoken podcast? Give your audio a lift, balance
+            your apps, and make your headphones feel at home.
+          </p>
+          <div class="hero-actions">
+            <a class="button button-orange" href="__DOWNLOAD_DMG__"
+              ><svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4" /></svg
+              >Download for Mac</a
+            ><a class="text-link" href="#features"
+              >Take a closer look <span aria-hidden="true">↓</span></a
+            >
+          </div>
+          <p class="download-meta">
+            Free &amp; open source <span>·</span> macOS 14.4+
+            <span>·</span> v__VERSION__
+          </p>
+          <a class="release-link" href="__RELEASE_URL__"
+            >What’s new in __VERSION__ <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <div
+          class="hero-stage"
+          aria-label="Interactive illustration of the FoFoBooster interface"
+        >
+          <div class="orbit orbit-one" aria-hidden="true"></div>
+          <div class="orbit orbit-two" aria-hidden="true"></div>
+          <div class="ambient-wave" aria-hidden="true">__WAVE_BARS__</div>
+          <div class="menu-bar" aria-hidden="true">
+            <span>Finder</span><span>File</span><span>Edit</span
+            ><span class="menu-spacer"></span><span>◖)))</span
+            ><span class="menu-active">▥</span><span>9:41</span>
+          </div>
+          <div class="booster-panel">
+            <div class="panel-header">
+              <div>
+                <span class="panel-kicker">YOUR SOUND, YOUR WAY</span>
+                <h2>FoFoBooster</h2>
+              </div>
+              <span class="power-icon" aria-hidden="true">⏻</span>
+            </div>
+            <div class="device-line">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4 14v-3a8 8 0 0 1 16 0v3M4 12H2v8h5v-8zm16 0h2v8h-5v-8z"
+                />
+              </svg>
+              <div>
+                <strong>Studio headphones</strong
+                ><span>YOUR OUTPUT, REMEMBERED</span>
+              </div>
+              <span class="device-check" aria-hidden="true">✓</span>
+            </div>
+            <div class="master-control">
+              <div class="master-title">
+                <label for="preview-boost">Master boost</label
+                ><output for="preview-boost" id="boost-value"
+                  >+6 <small>dB</small></output
+                >
+              </div>
+              <input
+                id="preview-boost"
+                type="range"
+                min="0"
+                max="12"
+                value="6"
+                step="1"
+                aria-describedby="preview-note"
+              />
+              <div class="slider-labels">
+                <span>Original</span><span>+12 dB</span>
+              </div>
+              <div class="protection">
+                <span class="shield" aria-hidden="true">✓</span> Peak protection
+                <span class="protected-badge">ON</span>
+              </div>
+            </div>
+            <div class="app-list">
+              <p class="panel-kicker">A LITTLE BALANCE</p>
+              <div class="app-row">
+                <span class="app-icon browser-icon" aria-hidden="true">◉</span
+                ><span>Browser</span><span class="mini-track"><i></i></span
+                ><span class="app-gain">+4 dB</span>
+              </div>
+              <div class="app-row">
+                <span class="app-icon music-icon" aria-hidden="true">♫</span
+                ><span>Music</span
+                ><span class="mini-track music-track"><i></i></span
+                ><span class="app-gain">+0 dB</span>
+              </div>
+            </div>
+            <div class="panel-bottom">
+              <span>〰 Visualizer</span><span>⊞ Plugins</span
+              ><span>⚙ Settings</span>
+            </div>
+          </div>
+          <div class="floating-note">
+            <span aria-hidden="true">↗</span>
+            <div>
+              <strong>A lift, not a fuss.</strong
+              ><span>Right in your menu bar.</span>
+            </div>
+          </div>
+          <p class="preview-note" id="preview-note">
+            <span aria-hidden="true">↳</span> Try the slider. It’s a preview —
+            no sound plays.
+          </p>
+        </div>
+      </section>
+      <div class="trust-strip wrap" aria-label="App essentials">
+        <span><i aria-hidden="true">✳</i> Native to your Mac</span
+        ><span><i aria-hidden="true">✓</i> Signed &amp; notarized</span
+        ><span><i aria-hidden="true">↗</i> Apple silicon + Intel</span
+        ><span><i aria-hidden="true">♡</i> No account. No ads.</span>
+      </div>
+      <section
+        class="features wrap section-space"
+        id="features"
+        aria-labelledby="features-heading"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">MORE SOUND. LESS FIDDLING.</p>
+            <h2 id="features-heading">Small app.<br />Thoughtful details.</h2>
+          </div>
+          <p>
+            The controls you need, a click away.<br />The rest stays out of your
+            way.
+          </p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature-card feature-wide">
+            <div class="feature-copy">
+              <span class="feature-number">01 / FIND YOUR BALANCE</span>
+              <h3>Every app.<br />Its own sweet spot.</h3>
+              <p>
+                Lift a quiet browser, leave your music alone. Set individual
+                levels, mute an app, or solo the one you want to hear.
+              </p>
+            </div>
+            <div class="mixer-art" aria-hidden="true">
+              <div>
+                <span>BROWSER</span><i style="--level: 68%"></i><b>+6</b>
+              </div>
+              <div><span>MUSIC</span><i style="--level: 28%"></i><b>+0</b></div>
+              <div><span>CALLS</span><i style="--level: 46%"></i><b>+3</b></div>
+              <span class="mixer-caption">One good mix. Yours.</span>
+            </div>
+          </article>
+          <article class="feature-card protection-card">
+            <span class="feature-number">02 / ROOM TO BREATHE</span>
+            <div class="limiter-art" aria-hidden="true">
+              <span>−1 dBTP</span>
+              <div>__LIMITER_BARS__</div>
+            </div>
+            <h3>A boost with boundaries.</h3>
+            <p>
+              An always-on limiter and a final soft-clip stage help contain
+              digital peaks while processing. Your volume is still your choice.
+            </p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">03 / MAKE YOURSELF AT HOME</span>
+            <div class="device-art" aria-hidden="true">
+              <span>◖)))</span><span class="device-art-arrow">↔</span
+              ><span>▣</span>
+            </div>
+            <h3>Different output.<br />Same familiar feeling.</h3>
+            <p>
+              Boost, balance, and effects are saved per device. Your headphones
+              and desk speakers can each have their own setup.
+            </p>
+          </article>
+          <article class="feature-card plugin-card">
+            <span class="feature-number">04 / A LITTLE MORE YOU</span>
+            <div class="plugin-art" aria-hidden="true">
+              <span>GAIN</span><i>→</i><span class="plugin-eq">EQ</span><i>→</i
+              ><span>LIMITER</span>
+            </div>
+            <h3>Your favorite effects.<br />Along for the ride.</h3>
+            <p>
+              Build a chain of up to eight Audio Units. Start with Apple’s
+              effects or use compatible AUs you already have installed.
+            </p>
+            <span class="card-footnote"
+              >Isolated plugin host · Peak protection after effects</span
+            >
+          </article>
+        </div>
+      </section>
+      <section class="visualizer-section" aria-labelledby="visualizer-heading">
+        <div class="wrap visualizer-content">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">SOUND, WITH A VIEW.</p>
+              <h2 id="visualizer-heading">
+                Give the music<br />a little space.
+              </h2>
+            </div>
+            <p>
+              Five Metal-powered visualizers.<br />From a quiet glow to a
+              full-screen escape.
+            </p>
+          </div>
+          <div class="visualizer-demo" data-preset="ember">
+            <div class="visualizer-grid" aria-hidden="true"></div>
+            <div class="visualizer-bars" aria-hidden="true">
+              __VISUALIZER_BARS__
+            </div>
+            <div class="halo-ring" aria-hidden="true"></div>
+            <div class="tide-line" aria-hidden="true"></div>
+            <div class="drift-particles" aria-hidden="true">__PARTICLES__</div>
+            <div class="visualizer-caption">
+              <span id="preset-title">Ember</span
+              ><span id="preset-description">A warm spectrum glow.</span
+              ><span>WEB PREVIEW</span>
+            </div>
+          </div>
+          <div
+            class="preset-controls"
+            role="group"
+            aria-label="Preview a visualizer style"
+          >
+            <button type="button" data-preset="ember" aria-pressed="true">
+              Ember</button
+            ><button type="button" data-preset="halo" aria-pressed="false">
+              Halo</button
+            ><button type="button" data-preset="tide" aria-pressed="false">
+              Tide</button
+            ><button type="button" data-preset="grid" aria-pressed="false">
+              Grid</button
+            ><button type="button" data-preset="drift" aria-pressed="false">
+              Drift</button
+            ><button
+              type="button"
+              class="motion-toggle"
+              id="motion-toggle"
+              aria-pressed="false"
+            >
+              Pause motion <span aria-hidden="true">Ⅱ</span>
+            </button>
+          </div>
+          <p class="visualizer-note">
+            An illustrative preview. The Mac app’s visualizers respond to your
+            audio and respect Reduce Motion.
+          </p>
+        </div>
+      </section>
+      <section
+        class="setup wrap section-space"
+        id="setup"
+        aria-labelledby="setup-heading"
+      >
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOU’RE THREE LITTLE STEPS AWAY.</p>
+            <h2 id="setup-heading">Set up. Settle in.</h2>
+          </div>
+          <a class="text-link" href="/guide/"
+            >The full getting-started guide
+            <span aria-hidden="true">↗</span></a
+          >
+        </div>
+        <ol class="steps">
+          <li>
+            <span class="step-number">01</span>
+            <h3>Make a little room.</h3>
+            <p>
+              Download the DMG, open it, and drag FoFoBooster into Applications.
+              It’s one app for Apple silicon and Intel.
+            </p>
+          </li>
+          <li>
+            <span class="step-number">02</span>
+            <h3>Let your sound in.</h3>
+            <p>
+              Open the app and follow setup to allow system audio recording.
+              That permission lets it process sound; it doesn’t save recordings.
+            </p>
+          </li>
+          <li>
+            <span class="step-number">03</span>
+            <h3>Find your level.</h3>
+            <p>
+              Choose your output and gently raise the boost. Use the power
+              button or <kbd>⌥</kbd><kbd>⇧</kbd><kbd>B</kbd> to return to
+              original audio.
+            </p>
+          </li>
+        </ol>
+      </section>
+      <section class="privacy-banner wrap">
+        <span class="privacy-symbol" aria-hidden="true">✳</span>
+        <div>
+          <p class="eyebrow">YOUR SOUND STAYS YOURS.</p>
+          <h2>Audio on your Mac.<br />Never on our servers.</h2>
+        </div>
+        <div>
+          <p>
+            No audio uploads. No recordings. No account. FoFoBooster processes
+            sound locally and offers optional automatic update checks.
+          </p>
+          <a class="text-link" href="/privacy/"
+            >A very readable privacy policy
+            <span aria-hidden="true">↗</span></a
+          >
+        </div>
+      </section>
+      <section
+        class="faq wrap section-space"
+        id="faq"
+        aria-labelledby="faq-heading"
+      >
+        <div>
+          <p class="eyebrow">GOOD QUESTIONS.</p>
+          <h2 id="faq-heading">A few things<br />worth knowing.</h2>
+          <p class="faq-aside">
+            Something else on your mind?<br /><a
+              href="https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/issues"
+              >Ask on GitHub <span aria-hidden="true">↗</span></a
+            >
+          </p>
+        </div>
+        <div class="faq-list">__FAQ_ITEMS__</div>
+      </section>
+      <section class="download-section wrap" id="download">
+        <div class="download-wave" aria-hidden="true">__WAVE_BARS__</div>
+        <p class="eyebrow">LESS “WHAT DID THEY SAY?”</p>
+        <h2>A little louder.<br />A lot more lovely.</h2>
+        <a class="button button-orange" href="__DOWNLOAD_DMG__"
+          >Download FoFoBooster <span aria-hidden="true">↓</span></a
+        >
+        <p>Free · macOS 14.4+ · Apple silicon &amp; Intel</p>
+        <div class="download-options">
+          <a href="__DOWNLOAD_PKG__">Prefer a PKG?</a><span>·</span
+          ><a href="__CHECKSUMS__">Verify download</a><span>·</span
+          ><a href="__RELEASE_URL__">Release notes</a>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap site-footer">
+      <div>
+        <a class="brand" href="/"
+          ><img src="/assets/icon.svg" width="28" height="28" alt="" /><span
+            >FoFo<span class="brand-light">Booster</span></span
+          ></a
+        >
+        <p>Made with care by Sweet Papa Technologies.</p>
+      </div>
+      <nav aria-label="Footer navigation">
+        <a href="/guide/">Guide</a><a href="/privacy/">Privacy</a
+        ><a href="https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster"
+          >GitHub ↗</a
+        ><a href="/llms.txt">llms.txt</a>
+      </nav>
+      <span class="footer-note">A little more sound. No strings attached.</span>
+    </footer>
+  </body>
+</html>

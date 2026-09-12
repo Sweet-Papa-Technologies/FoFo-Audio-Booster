@@ -1,6 +1,11 @@
 name: Signed macOS build
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish a new public version after signing (existing versions cannot be replaced)
+        type: boolean
+        default: false
   push:
     tags: ['v[0-9]*']
 permissions:
@@ -29,7 +34,9 @@ jobs:
             [[ "$REF_NAME" == "v$version" ]]
           fi
       - name: Run regression suite without signing secrets
-        run: scripts/test.sh
+        run: |
+          scripts/test.sh
+          python3 -m unittest discover -s Tests -p test_release_publication.py
       - name: Build universal app
         run: xcodebuild -project FoFoBooster.xcodeproj -scheme FoFoBooster -configuration Release -derivedDataPath .build/xcode -clonedSourcePackagesDirPath .build/packages CODE_SIGNING_ALLOWED=NO ARCHS='arm64 x86_64' ONLY_ACTIVE_ARCH=NO build
       - name: Preserve app bundle and Sparkle release tools
@@ -90,3 +97,23 @@ jobs:
             build/release/fofobooster.rb
             build/release/SHA256SUMS
             build/release/*.notary.json
+  publish:
+    needs: sign
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.publish == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: FoFoBooster-signed-notarized
+          path: build/release
+      - name: Verify and publish the signed installers and update feed
+        run: python3 scripts/publish-release.py
+        env:
+          GH_TOKEN: ${{ github.token }}
