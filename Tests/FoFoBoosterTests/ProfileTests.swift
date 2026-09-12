@@ -19,7 +19,8 @@ final class ProfileTests: XCTestCase {
     func testSoloCatchesFutureAndUnknownSources() {
         var profile = DeviceProfile(); profile.apps[browser.id] = AppLevel(solo: true)
         let plan = RoutingPlan.make(profile: profile, apps: [browser,music], ownProcesses: [99])
-        XCTAssertEqual(plan.count, 3); XCTAssertEqual(plan.last?.key, "__remaining__")
+        XCTAssertEqual(plan, [SourcePlan(key: browser.id, processes: [10,11], exclusive: false),
+                              SourcePlan(key: "__remaining__", processes: [10,11,99], exclusive: true)])
     }
     func testHelperAliasesRespectBundleBoundaries() {
         XCTAssertEqual(AppDiscovery.canonical("com.google.Chrome.helper.renderer"), "com.google.Chrome")

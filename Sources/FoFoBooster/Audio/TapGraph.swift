@@ -82,6 +82,7 @@ final class TapGraph {
         ff_set_master(dsp, Float(min(profile.boost, cap)), Float(profile.ceiling), Float(profile.balance), profile.mono, profile.loudness, Float(profile.target), Float(cap))
         for (index, slot) in profile.plugins.enumerated() { ff_bypass_plugin(dsp, UInt32(index), slot.bypass) }
     }
+    func fadeIn() { if let dsp { ff_set_fade(dsp, true) } }
     func fadeOut() { if let dsp { ff_set_fade(dsp, false) } }
     func stop() {
         // Stop the IOProc before disposing any memory it can access. Destroy the aggregate

@@ -12,7 +12,9 @@ The aggregate is never set as the system default output. Choosing an output in t
 
 ## Lifecycle and failure handling
 
-Reconfiguration fades the current route, coalesces changes, snapshots plugin state, stops the IOProc, destroys the aggregate, and destroys its taps. A generation token and cancellation protect against stale asynchronous AU construction. A new graph polls readiness for up to two seconds before starting. Device list/default output, sample rate, process changes, and sleep/wake trigger recovery. A periodic watchdog checks callback progress and deadline overruns; repeated failures invoke panic bypass. Temporary graphs clean up on every error.
+Discovery compares a canonical routing plan and the selected output ID/UID, rate, channel count, and buffer size. Unclaimed background apps, UI ordering/name/activity changes, and other connected devices do not rebuild the route. Solo uses the residual exclusive tap to mute unclaimed/new processes.
+
+Reconfiguration coalesces changes and snapshots plugin state while the current route keeps playing, then fades, stops the IOProc, destroys the aggregate, and destroys its taps. A superseding request reverses any pending fade. A generation token and cancellation protect against stale asynchronous AU construction. A new graph polls readiness for up to two seconds before starting. Device list/default output, sample rate, process changes, and sleep/wake trigger recovery. A periodic watchdog checks callback progress and deadline overruns; repeated failures invoke panic bypass. Temporary graphs clean up on every error.
 
 Panic bypass cancels rebuilds and tears down processing and analysis immediately. A process crash relies on Core Audio's ownership of private objects to release taps. There is no persistent driver or public aggregate to orphan.
 

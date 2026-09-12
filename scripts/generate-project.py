@@ -35,7 +35,7 @@ app_phases=[phase('appSources','PBXSourcesBuildPhase',[build(r) for r in app_sou
 widget_phases=[phase('widgetSources','PBXSourcesBuildPhase',[build(widget),build(shared,'widget')]),phase('widgetResources','PBXResourcesBuildPhase',[]),phase('widgetFrameworks','PBXFrameworksBuildPhase',[])]
 embed=add('embedWidgetBuild',isa='PBXBuildFile',fileRef=widget_product,settings={'ATTRIBUTES':['RemoveHeadersOnCopy']})
 app_phases.append(phase('embedWidget','PBXCopyFilesBuildPhase',[embed],dstPath='',dstSubfolderSpec=13,name='Embed App Extensions'))
-base={'MACOSX_DEPLOYMENT_TARGET':'14.4','SDKROOT':'macosx','SWIFT_VERSION':'5.0','CLANG_CXX_LANGUAGE_STANDARD':'c++17','CLANG_ENABLE_MODULES':'YES','ENABLE_HARDENED_RUNTIME':'YES','ARCHS':'$(ARCHS_STANDARD)','CODE_SIGN_STYLE':'Manual','DEVELOPMENT_TEAM':'6Y5SZ2K5XY','CODE_SIGN_IDENTITY':'Developer ID Application','SWIFT_EMIT_LOC_STRINGS':'YES','CURRENT_PROJECT_VERSION':'1','MARKETING_VERSION':'0.1.0','GENERATE_INFOPLIST_FILE':'NO','LD_RUNPATH_SEARCH_PATHS':['$(inherited)','@executable_path/../Frameworks']}
+base={'MACOSX_DEPLOYMENT_TARGET':'14.4','SDKROOT':'macosx','SWIFT_VERSION':'5.0','CLANG_CXX_LANGUAGE_STANDARD':'c++17','CLANG_ENABLE_MODULES':'YES','ENABLE_HARDENED_RUNTIME':'YES','ARCHS':'$(ARCHS_STANDARD)','CODE_SIGN_STYLE':'Manual','DEVELOPMENT_TEAM':'6Y5SZ2K5XY','CODE_SIGN_IDENTITY':'Developer ID Application','SWIFT_EMIT_LOC_STRINGS':'YES','CURRENT_PROJECT_VERSION':'2','MARKETING_VERSION':'0.1.1','GENERATE_INFOPLIST_FILE':'NO','LD_RUNPATH_SEARCH_PATHS':['$(inherited)','@executable_path/../Frameworks']}
 def configs(name, extra):
     configs=[]
     for mode in ['Debug','Release']:

@@ -27,7 +27,7 @@ private struct GeneralSettings: View {
                 if !UpdateService.shared.configured { Text("Updates become available in signed releases.").font(.caption).foregroundStyle(.secondary) }
             }
             Section("About") {
-                LabeledContent("FoFoBooster", value: "0.1.0 · Sweet Papa Technologies")
+                LabeledContent("FoFoBooster", value: "0.1.1 · Sweet Papa Technologies")
                 Text("Free. No accounts, analytics, or audio uploads.").foregroundStyle(.secondary)
                 Link("Source code & support", destination: URL(string: "https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster")!)
             }

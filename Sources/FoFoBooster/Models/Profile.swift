@@ -46,15 +46,33 @@ enum RoutingPlan {
         let solo = profile.apps.values.contains { $0.solo }
         let selected = apps.filter {
             let level = profile.apps[$0.id] ?? AppLevel()
-            return level.boost > 0 || level.muted || level.solo || solo
+            return level.boost > 0 || level.muted || level.solo
         }
-        var result = selected.map { SourcePlan(key: $0.id, processes: $0.processes.sorted(), exclusive: false) }
+        // UI discovery order and unrelated processes do not define the audio route.
+        // Solo's residual tap already silences every unclaimed process, including
+        // new background apps, without creating another tap for each one.
+        var result = selected.sorted { $0.id < $1.id }.map { SourcePlan(key: $0.id, processes: Array(Set($0.processes)).sorted(), exclusive: false) }
         if profile.needsMaster || solo {
-            result.append(SourcePlan(key: "__remaining__", processes: (ownProcesses + selected.flatMap(\.processes)).sorted(), exclusive: true))
+            result.append(SourcePlan(key: "__remaining__", processes: Array(Set(ownProcesses + selected.flatMap(\.processes))).sorted(), exclusive: true))
         }
         return result
     }
 }
+/// Only properties that change the running audio route. UI names, activity,
+/// latency reporting and other connected devices must not restart plugins.
+struct AudioRouteIdentity: Equatable {
+    let deviceID: UInt32?
+    let deviceUID: String?
+    let sampleRate: Double?
+    let channels: Int?
+    let bufferFrames: UInt32?
+    let sources: [SourcePlan]
+    init(device: OutputDevice?, sources: [SourcePlan]) {
+        deviceID = device?.id; deviceUID = device?.uid; sampleRate = device?.sampleRate
+        channels = device?.channels; bufferFrames = device?.bufferFrames; self.sources = sources
+    }
+}
+
 final class ProfileStore {
     private let defaults: UserDefaults
     init(defaults: UserDefaults = .standard) { self.defaults = defaults }

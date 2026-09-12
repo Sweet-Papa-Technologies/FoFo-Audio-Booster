@@ -39,6 +39,7 @@ final class AppModel: ObservableObject {
     private var analysisGraph: TapGraph?
     private var observers: [NSObjectProtocol] = []
     private var generation = 0
+    private var observedRouting: AudioRouteIdentity?
     private var lastCallbacks: UInt64 = 0
     private var stalls = 0
     private var lastFailures: UInt32 = 0
@@ -71,13 +72,15 @@ final class AppModel: ObservableObject {
         if permissionGranted { bypassed = false; rebuild() }
     }
     func refresh() {
-        let found = OutputDevice.discover()
-        let current = found.first { $0.id == HAL.defaultOutput() }
-        let changed = current?.uid != selectedUID || current?.sampleRate != device?.sampleRate
+        updateDiscovery(devices: OutputDevice.discover(), apps: AppDiscovery.discover(),
+                        defaultOutput: HAL.defaultOutput(), ownProcesses: ownProcesses())
+    }
+    @discardableResult
+    func updateDiscovery(devices found: [OutputDevice], apps newApps: [AudioApp], defaultOutput: AudioObjectID, ownProcesses: [UInt32]) -> Bool {
+        let current = found.first { $0.id == defaultOutput }
+        let changed = current?.uid != selectedUID || current?.id != device?.id || current?.sampleRate != device?.sampleRate
         if changed { savePluginState(); saveProfile() }
         devices = found
-        let newApps = AppDiscovery.discover()
-        let topologyChanged = apps.map { "\($0.id):\($0.processes)" } != newApps.map { "\($0.id):\($0.processes)" }
         apps = newApps
         if changed {
             selectedUID = current?.uid ?? ""
@@ -87,7 +90,14 @@ final class AppModel: ObservableObject {
             if let current { deviceListener.watch(current.id, kAudioDevicePropertyNominalSampleRate) { [weak self] in self?.refresh() } }
             listeningMonitor.resetContinuity()
         }
-        if changed || topologyChanged { rebuild() }
+        // An exclusive tap picks up unclaimed newcomers automatically. Refresh
+        // the panel freely, but leave its IOProc and plugin worker alive unless
+        // the selected output or the actual tap membership changed.
+        let route = AudioRouteIdentity(device: device, sources: RoutingPlan.make(profile: profile, apps: apps, ownProcesses: ownProcesses))
+        guard observedRouting != route else { return false }
+        observedRouting = route
+        scheduleRebuild()
+        return true
     }
     func selectDevice(_ uid: String) {
         guard let next = devices.first(where: { $0.uid == uid }) else { return }
@@ -140,19 +150,30 @@ final class AppModel: ObservableObject {
     }
     private func plan() -> [SourcePlan] { RoutingPlan.make(profile: profile, apps: apps, ownProcesses: ownProcesses()) }
     func rebuild() {
+        observedRouting = AudioRouteIdentity(device: device, sources: plan())
+        scheduleRebuild()
+    }
+    private func scheduleRebuild() {
         guard permissionGranted, !bypassed, !suspended else { return }
         generation += 1; let token = generation
         graphTask?.cancel()
+        // A newer change may cancel an older task during its final fade.
+        graph?.fadeIn()
         graphTask = Task { @MainActor [weak self] in
             guard let self else { return }
             working = true
             do {
-                // Coalesce slider changes and let the old path fade while it is still alive.
-                graph?.fadeOut()
+                // Keep playing while changes settle and the worker snapshots its
+                // state. Fade only when we are ready to replace the route.
                 try await Task.sleep(for: .milliseconds(100))
                 guard token == generation else { return }
                 await graph?.plugins.captureState()
                 guard token == generation else { return }
+                if let graph {
+                    graph.fadeOut()
+                    try await Task.sleep(for: .milliseconds(100))
+                    guard token == generation else { return }
+                }
                 savePluginState(); graph?.stop(); graph = nil; analysisGraph?.stop(); analysisGraph = nil
                 guard let device else { throw AudioFailure(operation: "No output device is available") }
                 var nextPlan = plan()

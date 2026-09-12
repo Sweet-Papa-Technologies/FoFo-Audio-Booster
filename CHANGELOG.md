@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 — playback continuity fix (2026-09-11)
+
+- Keep the existing audio route and plugin worker running when unrelated background apps launch, quit, change helper processes, or reorder in discovery.
+- Keep solo mode on a stable residual tap instead of adding a separate muted tap for every newcomer.
+- Continue playback while genuine route changes settle and plugin state is captured; resume a superseded fade when another change arrives.
+- Preserve recovery for controlled-app relaunches and selected-output format/buffer changes.
+- Add eight continuity regressions, including background process/device churn through the actual app discovery handler.
+
 ## 0.1.0 — development preview (2026-09-05)
 
 - Added native SwiftUI menu-bar app, three-step onboarding, output selection, per-app/master levels, mute/solo, and device profiles.

@@ -4,7 +4,7 @@ import argparse, concurrent.futures, hashlib, json, os, pathlib, plistlib, shuti
 from importlib.machinery import SourceFileLoader
 ROOT=pathlib.Path(__file__).resolve().parent.parent
 CONFIG=json.loads((ROOT/'Config/Signing.json').read_text())
-OUT=ROOT/'build/release';OUT.mkdir(parents=True,exist_ok=True)
+OUT=ROOT/'build/release'
 def run(args,**kwargs):
     return subprocess.run([str(v) for v in args],check=True,cwd=ROOT,**kwargs)
 def notarize(path):
@@ -16,7 +16,9 @@ def notarize(path):
         raise RuntimeError(f"Notarization did not accept {path.name}; submission {report.get('id')}.")
     print(f'Apple accepted {path.name}.',flush=True)
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--skip-build',action='store_true');parser.add_argument('--sign-only',action='store_true');parser.add_argument('--app',type=pathlib.Path);args=parser.parse_args()
+    global OUT
+    parser=argparse.ArgumentParser();parser.add_argument('--skip-build',action='store_true');parser.add_argument('--sign-only',action='store_true');parser.add_argument('--app',type=pathlib.Path);parser.add_argument('--output',type=pathlib.Path,default=OUT);args=parser.parse_args()
+    OUT=args.output.resolve();OUT.mkdir(parents=True,exist_ok=True)
     if not args.skip_build:
         run(['python3','scripts/generate-project.py'])
         with (OUT/'build.log').open('w') as log:
