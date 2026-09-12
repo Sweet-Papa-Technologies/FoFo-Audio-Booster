@@ -10,3 +10,14 @@ xcuserdata/
 *.mobileprovision
 __pycache__/
 *.pyc
+
+# Website build, local credentials, and deployment logs
+website/node_modules/
+website/dist/
+website/test-results/
+.firebase/
+firebase-debug*.log
+firepit-log.txt
+*-credentials.json
+*-sa.json
+gha-creds-*.json

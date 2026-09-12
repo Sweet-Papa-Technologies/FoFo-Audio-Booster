@@ -2,6 +2,8 @@
 
 A free, native macOS menu-bar audio booster from Sweet Papa Technologies. Built for macOS **14.4 or later**, on Apple silicon and Intel. No virtual audio driver, account, recording, or analytics.
 
+[Website and download](https://fofo-booster.web.app/) · [Public releases](https://github.com/Sweet-Papa-Technologies/FoFo-Audio-Booster/releases) · [Website development and deployment](website/README.md)
+
 **Development preview.** The universal app includes its widget and updater, SPT Developer ID signing, local notarization, and protected GitHub release builds. The signed per-app capture/gain/bypass test passes on this Mac, as do DSP, profile, routing, and isolated plugin-crash tests. Bluetooth transitions, a full hardware soak, and user-interface qualification remain. See [validation and remaining gaps](docs/VALIDATION.md).
 
 ## Run
