@@ -53,7 +53,8 @@ assert not any(r['tagName'] == tag for r in existing), f'{tag} already exists; d
 sha = os.environ['GITHUB_SHA']
 subprocess.run(['git', 'merge-base', '--is-ancestor', sha, 'origin/main'], check=True)
 notes = artifacts / 'release-notes.md'
-notes.write_text(f'''FoFoBooster {version} is a free, native Mac audio booster for macOS 14.4 and later, on Apple silicon and Intel.
+details = Path(f'docs/releases/{version}.md')
+notes.write_text((details.read_text()+'\n\n' if details.is_file() else '') + f'''FoFoBooster {version} is a free, native Mac audio booster for macOS 14.4 and later, on Apple silicon and Intel.
 
 Download the DMG and drag FoFoBooster to Applications, or use the PKG installer. These artifacts were built by GitHub Actions, Developer ID signed, notarized, and stapled. SHA256SUMS contains the installer and appcast checksums.
 

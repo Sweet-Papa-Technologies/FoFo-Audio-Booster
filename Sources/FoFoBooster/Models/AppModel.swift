@@ -33,6 +33,7 @@ final class AppModel: ObservableObject {
     private let store = ProfileStore()
     private let listener = HardwareListener()
     private var deviceListener = HardwareListener()
+    private var activityListeners: [AudioObjectID: HardwareListener] = [:]
     private var timer: Timer?
     private var graphTask: Task<Void, Never>?
     private var graph: TapGraph?
@@ -57,7 +58,12 @@ final class AppModel: ObservableObject {
     var rateMismatch: Bool { guard let device else { return false }; return effectiveSourceRate > 0 && !device.isCallMode && abs(device.sampleRate - effectiveSourceRate) > 1 }
     var totalLatency: Double { guard let device else { return 0 }; return device.latencyMS + (graph == nil ? 0 : Double(device.bufferFrames) / device.sampleRate * 1000 + 1.5 + (graph?.plugins.latency ?? 0) * 1000) }
     var pluginHost: PluginHost? { graph?.plugins }
-    var visibleApps: [AudioApp] { showAll ? apps : apps.filter { $0.running } }
+    var visibleApps: [AudioApp] {
+        showAll ? apps : apps.filter {
+            let level = profile.apps[$0.id] ?? AppLevel()
+            return $0.running || level.boost > 0 || level.muted || level.solo
+        }
+    }
     init() { profiles = store.load() }
     func start() {
         refresh()
@@ -67,13 +73,37 @@ final class AppModel: ObservableObject {
         let center = NSWorkspace.shared.notificationCenter
         observers.append(center.addObserver(forName: NSWorkspace.willSleepNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.sleep() } })
         observers.append(center.addObserver(forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { [weak self] _ in Task { @MainActor in self?.wake() } })
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.tick() } }
+        let refreshTimer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in Task { @MainActor in self?.tick() } }
+        // Menu tracking and slider drags must not freeze the app list/meters.
+        RunLoop.main.add(refreshTimer, forMode: .common)
+        timer = refreshTimer
         hotkeys = Hotkeys(model: self); hotkeys?.register()
         if permissionGranted { bypassed = false; rebuild() }
     }
     func refresh() {
-        updateDiscovery(devices: OutputDevice.discover(), apps: AppDiscovery.discover(),
+        let discovered = AppDiscovery.discover()
+        let ids = Set(discovered.flatMap(\.processes))
+        for id in Array(activityListeners.keys) where !ids.contains(id) {
+            activityListeners.removeValue(forKey: id)?.removeAll()
+        }
+        for id in ids where activityListeners[id] == nil {
+            let observer = HardwareListener()
+            observer.watch(id, kAudioProcessPropertyIsRunningOutput) { [weak self] in self?.refreshActivity() }
+            activityListeners[id] = observer
+        }
+        updateDiscovery(devices: OutputDevice.discover(), apps: discovered,
                         defaultOutput: HAL.defaultOutput(), ownProcesses: ownProcesses())
+    }
+    private func refreshActivity() {
+        updateActivity { HAL.value($0, kAudioProcessPropertyIsRunningOutput, default: UInt32(0)) != 0 }
+    }
+    /// Activity updates affect presentation only. Starting/pausing media must not
+    /// tear down a tap or restart the plugin worker.
+    func updateActivity(isRunning: (AudioObjectID) -> Bool) {
+        let updated = apps.map { app in
+            var next = app; next.running = app.processes.contains(where: isRunning); return next
+        }
+        if updated != apps { apps = updated }
     }
     @discardableResult
     func updateDiscovery(devices found: [OutputDevice], apps newApps: [AudioApp], defaultOutput: AudioObjectID, ownProcesses: [UInt32]) -> Bool {
@@ -132,6 +162,7 @@ final class AppModel: ObservableObject {
         generation += 1; graphTask?.cancel(); graphTask = nil
         savePluginState(); graph?.stop(); graph = nil
         analysisGraph?.stop(); analysisGraph = nil
+        analyzer.reset()
         bypassed = true; working = false; reduction = 0; peak = 0; listeningMonitor.resetContinuity(); detectedSourceRate = nil
         publishWidget()
     }
@@ -175,6 +206,7 @@ final class AppModel: ObservableObject {
                     guard token == generation else { return }
                 }
                 savePluginState(); graph?.stop(); graph = nil; analysisGraph?.stop(); analysisGraph = nil
+                analyzer.reset()
                 guard let device else { throw AudioFailure(operation: "No output device is available") }
                 var nextPlan = plan()
                 if visualizerOpen, !nextPlan.isEmpty, !nextPlan.contains(where: { $0.exclusive }) {
@@ -217,13 +249,20 @@ final class AppModel: ObservableObject {
         }
     }
     func setVisualizer(_ open: Bool) {
+        guard visualizerOpen != open else { return }
         visualizerOpen = open
         if !open {
             analysisGraph?.stop(); analysisGraph = nil; analyzer.reset()
             if graph?.plan.contains(where: { $0.key == "__analysis__" }) == true { rebuild() }
             else if let dsp = graph?.dsp { ff_set_analysis(dsp, false) }
         }
-        else if !bypassed { rebuild() }
+        else if !bypassed {
+            if let graph, graph.plan.contains(where: { $0.exclusive }) {
+                // Master/plugin routes already include all the system audio.
+                // Starting the picture must not interrupt the sound or effects.
+                ff_set_analysis(graph.dsp, true)
+            } else { rebuild() }
+        }
     }
     func updateSpectrum() {
         guard visualizerOpen, let dsp = graph?.dsp ?? analysisGraph?.dsp, let device else { return }
@@ -289,6 +328,7 @@ final class AppModel: ObservableObject {
     private func wake() { suspended = false; refresh(); if resumeAfterWake { bypassed = false; rebuild() } }
     func shutdown() {
         savePluginState(); saveProfile(); panic(); timer?.invalidate(); listener.removeAll(); deviceListener.removeAll()
+        activityListeners.values.forEach { $0.removeAll() }; activityListeners.removeAll()
         for observer in observers { NSWorkspace.shared.notificationCenter.removeObserver(observer) }; observers.removeAll()
     }
     func uninstall() {

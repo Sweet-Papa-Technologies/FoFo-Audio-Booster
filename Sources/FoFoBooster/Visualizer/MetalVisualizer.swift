@@ -13,6 +13,7 @@ struct VisualizerView: View {
     @ObservedObject var model: AppModel
     @AppStorage("visualPreset") private var preset = VisualPreset.ember.rawValue
     @AppStorage("visualLight") private var light = false
+    @State private var controlsVisible = true
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var selected: VisualPreset { VisualPreset(rawValue: preset) ?? .ember }
     var body: some View {
@@ -22,16 +23,20 @@ struct VisualizerView: View {
             } else {
                 MetalSurface(model: model, preset: selected, light: light).onTapGesture(count: 2) { NSApp.keyWindow?.toggleFullScreen(nil) }
             }
-            VStack(spacing: 12) {
+            if controlsVisible { VStack(spacing: 12) {
                 HStack {
                     VStack(alignment: .leading, spacing: 5) { Text(selected.rawValue.uppercased()).font(.system(size: 11, weight: .semibold, design: .monospaced)).tracking(3); Text(selected.subtitle).font(.system(size: 13)).foregroundStyle(.secondary) }
                     Spacer()
+                    Button { controlsVisible = false } label: { Image(systemName: "eye.slash") }.help("Hide visualizer controls").accessibilityLabel("Hide visualizer controls")
                     Button { light.toggle() } label: { Image(systemName: light ? "moon" : "sun.max") }.help("Switch light or dark appearance")
                     Button { NSApp.keyWindow?.toggleFullScreen(nil) } label: { Image(systemName: "arrow.up.left.and.arrow.down.right") }.help("Full screen").keyboardShortcut("f", modifiers: [.control, .command])
                 }
                 Picker("Visualizer preset", selection: $preset) { ForEach(VisualPreset.allCases) { Text($0.rawValue).tag($0.rawValue) } }.pickerStyle(.segmented)
                 if model.bypassed { Text("Boost is bypassed. Resume it to visualize system audio.").font(.caption).foregroundStyle(.secondary) }
             }.padding(22).background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 20)).padding(24).frame(maxWidth: 640)
+            } else {
+                HStack { Spacer(); Button { controlsVisible = true } label: { Label("Show controls", systemImage: "slider.horizontal.3") }.buttonStyle(.bordered).padding(16) }
+            }
         }.preferredColorScheme(light ? .light : .dark).frame(minWidth: 560, minHeight: 380)
             .onAppear { model.setVisualizer(!reduceMotion) }
             .onDisappear { model.setVisualizer(false) }
@@ -68,6 +73,7 @@ private struct MetalSurface: NSViewRepresentable {
         var started = ProcessInfo.processInfo.systemUptime
         var slowFrames = 0
         var quality: Float = 1
+        private let inFlight = DispatchSemaphore(value: 2)
         init(model: AppModel) { self.model = model }
         func configure(_ view: MTKView) {
             guard let device = view.device else { return }
@@ -91,19 +97,26 @@ private struct MetalSurface: NSViewRepresentable {
                 descriptor.colorAttachments[0].isBlendingEnabled = true
                 descriptor.colorAttachments[0].sourceRGBBlendFactor = .sourceAlpha
                 descriptor.colorAttachments[0].destinationRGBBlendFactor = .oneMinusSourceAlpha
+                descriptor.colorAttachments[0].sourceAlphaBlendFactor = .one
+                descriptor.colorAttachments[0].destinationAlphaBlendFactor = .oneMinusSourceAlpha
                 particlePipeline = try device.makeRenderPipelineState(descriptor: descriptor)
             } catch { Task { @MainActor in model.error = "The visualizer could not start: \(error.localizedDescription)" } }
         }
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) { }
         func draw(in view: MTKView) {
+            // Drop a visual frame instead of queuing work behind a busy GPU.
+            // Never make the UI/audio-control thread wait for rendering.
+            guard inFlight.wait(timeout: .now()) == .success else { return }
+            var submitted = false
+            defer { if !submitted { inFlight.signal() } }
             MainActor.assumeIsolated { model.updateSpectrum() }
             let time = ProcessInfo.processInfo.systemUptime
             let delta = Float(min(time-lastFrame, 0.1))
-            driftClock += delta * (1 + model.analyzer.flux * 20); lastFrame = time
+            driftClock += delta * (0.7 + model.analyzer.signal.level * 0.55 + model.analyzer.flux * 2.5); lastFrame = time
             view.clearColor = light ? MTLClearColor(red: 0.93, green: 0.94, blue: 0.96, alpha: 1) : MTLClearColor(red: 0.022, green: 0.027, blue: 0.035, alpha: 1)
             guard let descriptor = view.currentRenderPassDescriptor, let drawable = view.currentDrawable, let pipeline, let command = queue?.makeCommandBuffer() else { return }
             let accent = NSColor.controlAccentColor.usingColorSpace(.deviceRGB) ?? .systemOrange
-            var uniforms: [Float] = [Float(view.drawableSize.width), Float(view.drawableSize.height), Float(ProcessInfo.processInfo.systemUptime-started), Float(preset.index), light ? 1 : 0, quality, model.analyzer.flux, model.analyzer.centroid, Float(accent.redComponent), Float(accent.greenComponent), Float(accent.blueComponent), driftClock, delta, historyValid ? 1 : 0]
+            var uniforms: [Float] = [Float(view.drawableSize.width), Float(view.drawableSize.height), Float(ProcessInfo.processInfo.systemUptime-started), Float(preset.index), light ? 1 : 0, quality, model.analyzer.flux, model.analyzer.centroid, Float(accent.redComponent), Float(accent.greenComponent), Float(accent.blueComponent), driftClock, delta, historyValid ? 1 : 0, model.analyzer.signal.level, model.analyzer.signal.bass, model.analyzer.signal.mids, model.analyzer.signal.treble, model.analyzer.signal.onset]
             var bins = model.analyzer.bins, wave = model.analyzer.waveform, peaks = model.analyzer.peaks
             var tideTexture: MTLTexture?
             if preset == .tide, let device = view.device, let tidePipeline {
@@ -131,19 +144,23 @@ private struct MetalSurface: NSViewRepresentable {
                 }
             } else { history.removeAll(); historyValid = false }
             guard let encoder = command.makeRenderCommandEncoder(descriptor: descriptor) else { return }
-            encoder.setRenderPipelineState(tideTexture != nil ? tideDisplayPipeline ?? pipeline : preset == .drift ? particlePipeline ?? pipeline : pipeline)
+            encoder.setRenderPipelineState(tideTexture != nil ? tideDisplayPipeline ?? pipeline : pipeline)
             if let tideTexture { encoder.setFragmentTexture(tideTexture, index: 0) }
             encoder.setFragmentBytes(&uniforms, length: uniforms.count * 4, index: 0)
             encoder.setFragmentBytes(&bins, length: bins.count * 4, index: 1)
             encoder.setFragmentBytes(&wave, length: wave.count * 4, index: 2)
             encoder.setFragmentBytes(&peaks, length: peaks.count * 4, index: 3)
-            if preset == .drift {
+            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3)
+            if (preset == .drift || preset == .ember || preset == .halo), let particlePipeline {
+                encoder.setRenderPipelineState(particlePipeline)
                 encoder.setVertexBytes(&uniforms, length: uniforms.count * 4, index: 0)
                 encoder.setVertexBytes(&bins, length: bins.count * 4, index: 1)
-                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: quality > 0.75 ? 128 : 64)
-            } else { encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 3) }
+                encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6, instanceCount: preset == .drift ? (quality > 0.75 ? 512 : 256) : 128)
+            }
             encoder.endEncoding(); command.present(drawable)
+            let framePermit = inFlight
             command.addCompletedHandler { [weak self] buffer in
+                framePermit.signal()
                 let duration = buffer.gpuEndTime - buffer.gpuStartTime
                 DispatchQueue.main.async {
                     guard let self else { return }
@@ -151,7 +168,7 @@ private struct MetalSurface: NSViewRepresentable {
                     if self.slowFrames > 20 { self.quality = 0.5; view.preferredFramesPerSecond = 30 }
                 }
             }
-            command.commit()
+            submitted = true; command.commit()
         }
     }
 }
