@@ -61,7 +61,7 @@ struct MenuPanel: View {
                 }
             }
             VStack(spacing: 0) {
-                HStack { Text("NOW PLAYING").font(.system(size: 10, weight: .bold)).tracking(1.3).foregroundStyle(.secondary); Spacer(); Button(model.showAll ? "Active only" : "Show all") { model.showAll.toggle() }.font(.caption).buttonStyle(.plain).foregroundStyle(Color.fofo) }.padding(.horizontal, 6).padding(.vertical, 12)
+                HStack { Text("NOW PLAYING").font(.system(size: 10, weight: .bold)).tracking(1.3).foregroundStyle(.secondary).help("Apps with active audio output, plus apps with saved volume controls. Some apps keep audio output open while paused."); Spacer(); Button(model.showAll ? "Active & adjusted" : "Show all") { model.showAll.toggle() }.font(.caption).buttonStyle(.plain).foregroundStyle(Color.fofo) }.padding(.horizontal, 6).padding(.vertical, 12)
                 if model.visibleApps.isEmpty {
                     VStack(spacing: 8) { Image(systemName: "music.note").font(.title2).foregroundStyle(.tertiary); Text("A little quiet in here").font(.callout.weight(.medium)); Text("Play something in an app to give it a boost.").font(.caption).foregroundStyle(.secondary) }.frame(maxWidth: .infinity).padding(.vertical, 22)
                 } else {
@@ -101,6 +101,7 @@ private struct AppRow: View {
                 if let url = app.bundleURL { Image(nsImage: NSWorkspace.shared.icon(forFile: url.path)).resizable().frame(width: 27, height: 27) }
                 else { Image(systemName: "app.fill").font(.title2).foregroundStyle(.secondary).frame(width: 27) }
                 Text(app.name).font(.system(size: 12, weight: .medium)).lineLimit(1)
+                if !app.running { Text("Idle").font(.system(size: 9)).foregroundStyle(.secondary) }
                 Spacer()
                 Button { model.setApp(app.id) { $0.muted.toggle() } } label: { Image(systemName: level.muted ? "speaker.slash.fill" : "speaker.wave.2").frame(width: 22) }.foregroundStyle(level.muted ? Color.fofo : Color.secondary).help("Mute \(app.name)").accessibilityLabel("Mute \(app.name)").accessibilityValue(level.muted ? "On" : "Off")
                 Button { model.setApp(app.id) { $0.solo.toggle() } } label: { Text("S").font(.system(size: 10, weight: .bold)).frame(width: 20, height: 20).background(level.solo ? Color.fofo.opacity(0.2) : Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 5)) }.foregroundStyle(level.solo ? Color.fofo : Color.secondary).help("Solo \(app.name)").accessibilityLabel("Solo \(app.name)").accessibilityValue(level.solo ? "On" : "Off")
